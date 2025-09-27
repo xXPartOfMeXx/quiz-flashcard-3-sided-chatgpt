@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-Face Flashcards .csv Creator</title>
+  <style>
+	.subtitle1 {
+	font-size: 1rem;
+	margin-bottom: 15px;
+}
+	.subtitle2 {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #FFFB00;
+  margin-bottom: 15px;
+}
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+    .sidebar, .main {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 20px;
+      flex: 1;
+    }
+    .sidebar {
+      max-width: 350px;
+    }
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card-item {
+      padding: 10px;
+      background: #334155;
+      border-radius: 6px;
+    }
+    .card-item strong {
+      display: block;
+    }
+    .flashcard {
+      width: 100%;
+      height: 200px;
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 8px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      background: #0284c7;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0369a1;
+    }
+    input {
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: white;
+    }
+    .editor {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .editor input {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <h1>3-Face Flashcards .csv Creator</h1>
+  <h2 class="subtitle1">Create your own .csv 3-face flashcards</h2>
+  <h3 class="subtitle2">Made entirely in ChatGPT (super OP) from Panana Astley</h3>
+  <div class="container">
+    <div class="sidebar">
+      <input type="file" id="csvFile" accept=".csv"><br><br>
+      <div class="card-list" id="cardList"></div>
+      <button onclick="clearAll()">Clear all</button>
+      <button onclick="shuffleCards()">Shuffle</button>
+      <button onclick="exportCSV()">Export CSV</button>
+    </div>
+
+    <div class="main">
+      <div class="flashcard" id="flashcard">No cards yet</div>
+      <div>
+        <button onclick="prevFace()">◀ Prev</button>
+        <button onclick="flipCard()">Flip</button>
+        <button onclick="nextCard()">Next ▶</button>
+      </div>
+
+      <div class="editor">
+        <input type="text" id="word" placeholder="Word">
+        <input type="text" id="antonym" placeholder="Antonym">
+        <input type="text" id="meaning" placeholder="Meaning">
+      </div>
+      <div>
+        <button onclick="addNewCard()">Add New Card</button>
+        <button onclick="saveCard()">Save</button>
+        <button onclick="deleteCurrentCard()">Delete</button>
+      </div>
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    let flashcards = JSON.parse(localStorage.getItem("flashcards")) || [];
+    let currentCard = 0;
+    let currentFace = 0;
+
+    const flashcardEl = document.getElementById("flashcard");
+    const cardListEl = document.getElementById("cardList");
+
+    function updateCard() {
+      if (flashcards.length === 0) {
+        flashcardEl.textContent = "No cards yet";
+        return;
+      }
+      const card = flashcards[currentCard];
+      if (currentFace === 0) flashcardEl.textContent = card.word;
+      if (currentFace === 1) flashcardEl.textContent = card.antonym;
+      if (currentFace === 2) flashcardEl.textContent = card.meaning;
+      document.getElementById("word").value = card.word;
+      document.getElementById("antonym").value = card.antonym;
+      document.getElementById("meaning").value = card.meaning;
+      renderList();
+    }
+
+    function flipCard() {
+      if (flashcards.length === 0) return;
+      currentFace = (currentFace + 1) % 3;
+      updateCard();
+    }
+
+    function prevFace() {
+      if (flashcards.length === 0) return;
+      currentFace = (currentFace + 2) % 3;
+      updateCard();
+    }
+
+    function nextCard() {
+      if (flashcards.length === 0) return;
+      currentCard = (currentCard + 1) % flashcards.length;
+      currentFace = 0;
+      updateCard();
+    }
+
+    function saveCard() {
+      if (flashcards.length === 0) return;
+      flashcards[currentCard] = {
+        word: document.getElementById("word").value,
+        antonym: document.getElementById("antonym").value,
+        meaning: document.getElementById("meaning").value
+      };
+      saveFlashcards();
+      updateCard();
+    }
+
+    function addNewCard() {
+      flashcards.push({
+        word: document.getElementById("word").value,
+        antonym: document.getElementById("antonym").value,
+        meaning: document.getElementById("meaning").value
+      });
+      currentCard = flashcards.length - 1;
+      saveFlashcards();
+      updateCard();
+    }
+
+    function deleteCurrentCard() {
+      if (flashcards.length === 0) return;
+      flashcards.splice(currentCard, 1);
+      if (currentCard >= flashcards.length) currentCard = flashcards.length - 1;
+      saveFlashcards();
+      updateCard();
+    }
+
+    function clearAll() {
+      flashcards = [];
+      saveFlashcards();
+      updateCard();
+    }
+
+    function shuffleCards() {
+      for (let i = flashcards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+      }
+      currentCard = 0;
+      updateCard();
+    }
+
+    function renderList() {
+      cardListEl.innerHTML = "";
+      flashcards.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "card-item";
+        div.innerHTML = `<strong>${c.word}</strong> ${c.meaning} — ${c.antonym}`;
+        div.onclick = () => { currentCard = i; currentFace = 0; updateCard(); };
+        cardListEl.appendChild(div);
+      });
+    }
+
+    function saveFlashcards() {
+      localStorage.setItem("flashcards", JSON.stringify(flashcards));
+    }
+
+    // CSV Import
+    document.getElementById("csvFile").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const text = event.target.result;
+        const lines = text.split(/\r?\n/);
+        let imported = [];
+        for (let i = 0; i < lines.length; i++) {
+          const cols = lines[i].split(",");
+          if (cols.length >= 3) {
+            const w = cols[0].trim();
+            const a = cols[1].trim();
+            const m = cols[2].trim();
+            if (w.toLowerCase() === "word" && a.toLowerCase().includes("antonym") && m.toLowerCase().includes("meaning")) {
+              continue;
+            }
+            imported.push({ word: w, antonym: a, meaning: m });
+          }
+        }
+        if (imported.length > 0) {
+          flashcards = flashcards.concat(imported);
+          saveFlashcards();
+          currentCard = 0;
+          currentFace = 0;
+          updateCard();
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // CSV Export
+    function exportCSV() {
+      if (flashcards.length === 0) return;
+      let csvContent = "";
+      flashcards.forEach(card => {
+        csvContent += `${card.word},${card.antonym},${card.meaning}\n`;
+      });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "flashcards.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    updateCard();
+  </script>
+</body>
+</html>

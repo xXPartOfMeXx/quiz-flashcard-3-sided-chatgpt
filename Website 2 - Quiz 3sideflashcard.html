@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MCQ Quiz from CSV</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background: #f9f9f9; }
+    h2 { margin-top: 20px; }
+	.subtitle {
+  font-size: 0.8rem;
+  color: #555;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+    .question-box { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .answers button { display: block; margin: 5px 0; padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 5px; background: #eee; cursor: pointer; }
+    .answers button:hover { background: #ddd; }
+    .correct { background: #c8f7c5 !important; border-color: #27ae60 !important; }
+    .wrong { background: #f7c5c5 !important; border-color: #e74c3c !important; }
+    .feedback { margin-top: 10px; font-weight: bold; white-space: pre-line; }
+    #scoreBox { margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; font-size: 1.2em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <h1>ÔN TẬP FLASHCARD 3 MẶT</h1>
+  <p>Tải lên file .csv để bắt đầu. Format: đề,trl,gthk</p>
+  <p class="subtitle">Made entirely in ChatGPT (super OP) from Panana Astley</p>
+  <input type="file" id="csvFile" accept=".csv">
+  <div id="quiz"></div>
+  <div id="scoreBox"></div>
+
+  <script>
+    function parseCSV(text) {
+      return text.trim().split("\n").map(line => line.split(","));
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function buildQuiz(data) {
+      const quizContainer = document.getElementById("quiz");
+      const scoreBox = document.getElementById("scoreBox");
+      quizContainer.innerHTML = "";
+      scoreBox.innerHTML = "";
+
+      let correctCount = 0;
+      let answeredCount = 0;
+      const totalQuestions = data.length;
+
+      shuffle(data).forEach(([question, correctAnswer, definition], qIndex) => {
+        const questionBox = document.createElement("div");
+        questionBox.className = "question-box";
+
+        const qText = document.createElement("h2");
+        qText.textContent = `Q${qIndex + 1}: ${question}`;
+        questionBox.appendChild(qText);
+
+        const allAnswers = data.map(d => d[1]);
+        const options = shuffle([correctAnswer, ...shuffle(allAnswers).slice(0, 3).filter(a => a !== correctAnswer)]);
+        
+        const answersDiv = document.createElement("div");
+        answersDiv.className = "answers";
+
+        const feedback = document.createElement("div");
+        feedback.className = "feedback";
+
+        options.forEach(option => {
+          const btn = document.createElement("button");
+          btn.textContent = option;
+          btn.onclick = () => {
+            [...answersDiv.children].forEach(b => b.disabled = true);
+
+            if (option === correctAnswer) {
+              btn.classList.add("correct");
+              feedback.textContent = `✅ Correct!\nDefinition: ${definition}`;
+              feedback.style.color = "green";
+              correctCount++;
+            } else {
+              btn.classList.add("wrong");
+              feedback.textContent = `❌ Wrong.\nCorrect answer: ${correctAnswer}\nDefinition: ${definition}`;
+              feedback.style.color = "red";
+            }
+
+            answeredCount++;
+            if (answeredCount === totalQuestions) {
+              const percentage = Math.round((correctCount / totalQuestions) * 100);
+              scoreBox.textContent = `Final Score: ${correctCount}/${totalQuestions} (${percentage}%)`;
+            }
+          };
+          answersDiv.appendChild(btn);
+        });
+
+        questionBox.appendChild(answersDiv);
+        questionBox.appendChild(feedback);
+        quizContainer.appendChild(questionBox);
+      });
+    }
+
+    document.getElementById("csvFile").addEventListener("change", function() {
+      const file = this.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const data = parseCSV(text);
+        buildQuiz(data);
+      };
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+</html>
