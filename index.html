@@ -1,61 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
   <meta charset="UTF-8">
   <title>MCQ Quiz from CSV</title>
   <style>
+	  /* Make form labels and inputs bigger */
+	label {
+	  font-size: 1.0rem;      /* 🔼 bigger text for “Số câu hỏi”, etc. */
+	  font-weight: 600;
+	}
+
+	input[type="number"],
+	input[type="file"] {
+	  font-size: 1.0rem;      /* slightly smaller than label but readable */
+	  padding: 4px 6px;
+	  margin-top: 5px;
+	}
+
+	#timerDisplay {
+	  position: fixed;
+	  top: 20px;             /* distance from top edge */
+	  right: 30px;           /* distance from right edge */
+	  background-color: #fff3cd;
+	  border: 2px solid #ffc107;
+	  color: #d9534f;
+	  padding: 10px 15px;
+	  border-radius: 10px;
+	  font-weight: bold;
+	  font-size: 2rem;
+	  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+	  z-index: 1000;
+	}
+
+	.replay-btn {
+	  position: fixed;       /* makes it stay in place when scrolling */
+	  box-shadow: none !important;       /* 💥 remove any shadow */
+	  outline: none !important;          /* remove focus outline */
+	  bottom: 20px;          /* distance from bottom edge */
+	  right: 20px;           /* distance from right edge */
+	  padding: 12px 18px;
+	  background: none;
+	  border: none;
+	  color: white;
+	  width: 100px;
+	  height: 100px;	
+	  font-size: 4rem;
+	  border: none;
+	  cursor: pointer;
+	  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+	  z-index: 1000;         /* ensures it stays above other content */
+	  opacity: 0.9;
+	  transition: all 0.2s ease;
+	}
+
+	.replay-btn:hover {
+	  opacity: 1;
+	  background:none;
+	  box-shadow: none;       /* 💥 remove any shadow */
+	  outline: none;          /* remove focus outline */
+	  transform: scale(1.1);
+	}
+
     body { font-family: Arial, sans-serif; margin: 30px; background: #f9f9f9; }
     h2 { margin-top: 20px; }
 	.subtitle {
-  font-size: 0.9rem;
-  color: #555;
-  font-style: italic;
-  margin-bottom: 15px;
-  margin-left: 20px;
-}
-	.rednotething {margin-left: 20px; font-size:0.9rem; font-style:italic; font-weight:bold; color:#FF0000;}
+      font-size: 0.9rem;
+      color: #555;
+      font-style: italic;
+      margin-bottom: 15px;
+      margin-left: 20px;
+    }
+	.rednotething {
+      margin-left: 20px; 
+      font-size:0.9rem; 
+      font-style:italic; 
+      font-weight:bold; 
+      color:#FF0000;
+    }
+	.rednotethingbig {
+      margin-left: 20px; 
+      font-size:1.2rem; 
+      font-style:italic; 
+      font-weight:bold; 
+      color:#FF0000;
+    }
     .question-box { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .answers button { display: block; margin: 5px 0; padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 5px; background: #eee; cursor: pointer; }
-    .answers button:hover { background: #ddd; }
+    .answers button { display: block; margin: 5px 0; padding: 16px 20px; font-size: 1.5rem; width: 100%; border: 1px solid #ccc; border-radius: 5px; background: #eee; cursor: pointer; }
+    .answers button:hover {transform: scale(1.05);font-size: 1.7rem;}
     .correct { background: #c8f7c5 !important; border-color: #27ae60 !important; }
     .wrong { background: #f7c5c5 !important; border-color: #e74c3c !important; }
     .feedback { margin-top: 10px; font-weight: bold; white-space: pre-line; }
     #scoreBox { margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; font-size: 1.2em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  
+	  /* Make answer buttons smaller on phones */
+	@media (max-width: 600px) {
+	  .answers button {
+		font-size: 1rem;      /* smaller text */
+		padding: 8px 10px;    /* less vertical padding */
+	  }
+	  .replay-btn {
+		position: fixed;
+		box-shadow: none;       /* 💥 remove any shadow */
+		outline: none;          /* remove focus outline */
+		bottom: 20px;
+		right: 20px;
+		background: none;         /* transparent background */
+		border: none;             /* remove border */
+		color: #007bff;           /* icon color */
+		font-size: 3.5rem;       /* icon size */
+		cursor: pointer;
+		z-index: 1000;
+		transition: transform 0.2s ease, color 0.2s ease;
+		opacity: 0.9;
+	  }
+	}
+
   </style>
 </head>
 <body>
   <h1 style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT</h1>
+  <h2 id="timerDisplay">⏱️ 00:00</h2>
   <p class="subtitle">
-  Chọn số câu hỏi rồi tải lên file [*.csv] để bắt đầu.
+    Chọn số câu hỏi rồi tải lên file [*.csv] để bắt đầu.
   </p>
-  <p class = "rednotething">
-  *FORMAT BẮT BUỘC: [Đề,Câu trả lời,Lý giải] tương ứng với [Face1,Face2,Face3]<br><br>
-  Xem lại và chỉnh sửa flashcard 3 mặt <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a>.
+  <p class="rednotething">
+    *FORMAT BẮT BUỘC: [Đề,Câu trả lời,Lý giải] tương ứng với [Face1,Face2,Face3]<br><br>
+    Xem lại và chỉnh sửa flashcard 3 mặt <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a>. (hỗ trợ điện thoại nhưng xấu...)
   </p>
   <p class="subtitle">Made entirely in ChatGPT (super OP) from Panana Astley</p>
+  <p class="rednotethingbig">❗❗ SAU KHI TẢI FILE LÊN THÌ PHẢI NHẤN 🔁 ÍT NHẤT 1 LẦN TRƯỚC KHI BẮT ĐẦU (có thể có bug) ❗❗</p>
   <label style="margin-left: 20px;" for="limitInput">Số câu hỏi: </label>
   <input type="number" id="limitInput" min="1" style="width:70px"><br>
-  <p style = "font-size: 1.2rem; margin-left: 20px;">
-  Tải lên file [*.csv]:<br>
-  <input style = "font-size: 1.1rem;" type="file" id="csvFile" accept=".csv">
+  <label style="margin-left: 20px;" for="timeInput">Thời gian làm bài (phút): </label>
+  <input type="number" id="timeInput" min="0.1" step="0.1" style="width:80px"><br>
+  <button id="replayBtn" class="replay-btn" style="display:none;" title="Chơi lại">🔁</button>
+  <p style="font-size: 1.2rem; margin-left: 20px;">
+    Tải lên file [*.csv]:<br>
+    <input style="font-size: 1.1rem;" type="file" id="csvFile" accept=".csv">
   </p>
+
   <br><br>
   <div id="quiz"></div>
   <div id="scoreBox"></div>
 
-  <script>
-    function parseCSV(text) {
-      return text.trim().split("\n").map(line => line.split(","));
-    }
+<script>
+let timerInterval = null;
+let quizEnded = false;
+let remainingSeconds = 0;
+let quizStartTime = null;
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
+// 🧩 NEW global score tracking
+let correctCountGlobal = 0;
+let totalQuestionsGlobal = 0;
 
+const replayBtn = document.getElementById("replayBtn");
+let lastCSVData = null;
+let lastQuestionLimit = null;
+
+// ========== Helpers ==========
+function parseCSV(text) {
+  return text.trim().split("\n").map(line => line.split(","));
+}
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// ========== Build Quiz ==========
 function buildQuiz(data) {
   const quizContainer = document.getElementById("quiz");
   const scoreBox = document.getElementById("scoreBox");
@@ -67,11 +182,44 @@ function buildQuiz(data) {
 
   const limit = parseInt(document.getElementById("limitInput").value) || data.length;
   const totalQuestions = Math.min(limit, data.length);
+  totalQuestionsGlobal = totalQuestions; // store globally
 
-  // ✅ Shuffle all data, then take only N questions
+  // --- TIMER SETUP ---
+  const timerDisplay = document.getElementById("timerDisplay");
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerDisplay.style.display = "none";
+  quizEnded = false;
+
+  const timeLimitMinutes = parseFloat(document.getElementById("timeInput").value);
+  if (timeLimitMinutes && timeLimitMinutes > 0) {
+    remainingSeconds = timeLimitMinutes * 60;
+    quizStartTime = Date.now();
+    timerDisplay.style.display = "block";
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+      if (quizEnded) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        return;
+      }
+      remainingSeconds--;
+      updateTimerDisplay();
+      if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        quizEnded = true;
+        // 👇 use global score
+        correctCountGlobal = correctCount;
+        endQuizEarly();
+      }
+    }, 1000);
+  } else {
+    quizStartTime = Date.now();
+  }
+
   const selectedQuestions = shuffle([...data]).slice(0, totalQuestions);
-
-  // ✅ Collect all possible answers from full dataset (not just N)
   const allAnswers = data.map(d => d[1]);
 
   selectedQuestions.forEach(([question, correctAnswer, definition], qIndex) => {
@@ -82,25 +230,50 @@ function buildQuiz(data) {
     qText.textContent = `Q${qIndex + 1}: ${question}`;
     questionBox.appendChild(qText);
 
-    // ✅ Shuffle answer pool, pick 3 wrong + 1 correct
-    const options = shuffle([
-      correctAnswer,
-      ...shuffle(allAnswers).filter(a => a !== correctAnswer).slice(0, 3)
-    ]);
+    // Unique answers
+    const uniqueAnswers = new Set();
+    uniqueAnswers.add(correctAnswer.toLowerCase());
+    shuffle(allAnswers).forEach(a => {
+      if (uniqueAnswers.size < 4 &&
+          a.toLowerCase() !== correctAnswer.toLowerCase() &&
+          !uniqueAnswers.has(a.toLowerCase())) {
+        uniqueAnswers.add(a.toLowerCase());
+      }
+    });
+    const options = shuffle(
+      [...uniqueAnswers].map(txt =>
+        allAnswers.find(a => a.toLowerCase() === txt) || txt
+      )
+    );
 
     const answersDiv = document.createElement("div");
     answersDiv.className = "answers";
-
     const feedback = document.createElement("div");
     feedback.className = "feedback";
 
     options.forEach(option => {
       const btn = document.createElement("button");
       btn.textContent = option;
+
       btn.onclick = () => {
         [...answersDiv.children].forEach(b => b.disabled = true);
 
-        if (option === correctAnswer) {
+        if (quizEnded) {
+          // Time's up → show feedback only
+          if (option.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
+            btn.classList.add("correct");
+            feedback.textContent = `✅ Correct!\nDefinition: ${definition}`;
+            feedback.style.color = "green";
+          } else {
+            btn.classList.add("wrong");
+            feedback.textContent = `❌ Wrong.\nCorrect answer: ${correctAnswer}\nDefinition: ${definition}`;
+            feedback.style.color = "red";
+          }
+          return;
+        }
+
+        // Normal answer
+        if (option.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
           btn.classList.add("correct");
           feedback.textContent = `✅ Correct!\nDefinition: ${definition}`;
           feedback.style.color = "green";
@@ -112,22 +285,16 @@ function buildQuiz(data) {
         }
 
         answeredCount++;
+
         if (answeredCount === totalQuestions) {
-          const percentage = Math.round((correctCount / totalQuestions) * 100);
-		  if (percentage >= 75) {
-			scoreBox.textContent = `Final Score: ${correctCount}/${totalQuestions} (${percentage}%). Youre a genius! 🎉🎉`;
-		  }
-		  else if (percentage >= 50 && percentage < 75)
-		  {
-			scoreBox.textContent = `Final Score: ${correctCount}/${totalQuestions} (${percentage}%). Congratulations! 🎉`;
-		  }
-		  else if (percentage > 0 && percentage < 50) {
-			scoreBox.textContent = `Final Score: ${correctCount}/${totalQuestions} (${percentage}%). We Asians are disappointed in you 😡👿`;
-		  }
-		  else 
-			scoreBox.textContent = `ARE YOU DUMB?`;
+          quizEnded = true;
+          clearInterval(timerInterval);
+          timerInterval = null;
+          correctCountGlobal = correctCount;
+          endQuizEarly();
         }
       };
+
       answersDiv.appendChild(btn);
     });
 
@@ -137,17 +304,112 @@ function buildQuiz(data) {
   });
 }
 
+// ========== Timer Display ==========
+function updateTimerDisplay() {
+  const timerDisplay = document.getElementById("timerDisplay");
+  const mins = Math.floor(remainingSeconds / 60);
+  const secs = remainingSeconds % 60;
+  timerDisplay.textContent = `⏱️ ${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+}
 
-    document.getElementById("csvFile").addEventListener("change", function() {
-      const file = this.files[0];
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const data = parseCSV(text);
-        buildQuiz(data);
-      };
-      reader.readAsText(file);
-    });
-  </script>
+// ========== End Quiz Early ==========
+function endQuizEarly() {
+  const scoreBox = document.getElementById("scoreBox");
+  const timerDisplay = document.getElementById("timerDisplay");
+
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerDisplay.style.display = "none";
+  quizEnded = true;
+
+  const totalTime = ((Date.now() - quizStartTime) / 1000).toFixed(1);
+  const percentage = Math.round((correctCountGlobal / totalQuestionsGlobal) * 100);
+
+  // ✅ Check if the user actually set a timer
+  const timeLimitInput = parseFloat(document.getElementById("timeInput").value);
+
+  let timeMessage;
+  if (timeLimitInput && remainingSeconds <= 0) {
+    // only show easter egg if timer was set and time ran out
+    timeMessage = "YOU'RE TAKING TOO LONG 🎃";
+  } else {
+    timeMessage = `Thời gian làm bài: ${totalTime} giây`;
+  }
+
+  let resultMessage = "";
+  if (percentage >= 75) {
+    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). You’re a genius! 🎉🎉`;
+  } else if (percentage >= 50 && percentage < 75) {
+    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). Congratulations! 🎉`;
+  } else if (percentage > 0 && percentage < 50) {
+    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). We Asians are disappointed in you 😡👿`;
+  } else {
+    resultMessage = `ARE YOU DUMB?`;
+  }
+
+  scoreBox.innerHTML = `${resultMessage}<br>${timeMessage}`;
+}
+
+
+// ========== CSV Loader & Replay ==========
+function startQuizFromCSV(text) {
+  const data = parseCSV(text);
+  buildQuiz(data);
+}
+
+document.getElementById("csvFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    const text = evt.target.result;
+    lastCSVData = text;
+    lastQuestionLimit = parseInt(document.getElementById("limitInput").value) || null;
+    replayBtn.style.display = "inline-block";
+    startQuizFromCSV(text);
+  };
+  reader.readAsText(file);
+});
+
+replayBtn.addEventListener("click", () => {
+  if (lastCSVData) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById("quiz").innerHTML = "";
+    document.getElementById("scoreBox").textContent = "";
+    document.getElementById("timerDisplay").style.display = "none";
+    clearInterval(timerInterval);
+    timerInterval = null;
+    quizEnded = false;
+    correctCountGlobal = 0;
+    totalQuestionsGlobal = 0;
+
+    if (lastQuestionLimit) {
+      document.getElementById("limitInput").value = lastQuestionLimit;
+    }
+
+    startQuizFromCSV(lastCSVData);
+  }
+});
+
+function updateTimerDisplay() {
+  const timerDisplay = document.getElementById("timerDisplay");
+  const mins = Math.floor(remainingSeconds / 60);
+  const secs = remainingSeconds % 60;
+  timerDisplay.textContent = `⏱️ ${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+  
+  // Flash red in last 10 seconds
+  if (remainingSeconds <= 10) {
+    timerDisplay.style.backgroundColor = "#f8d7da";
+    timerDisplay.style.borderColor = "#dc3545";
+    timerDisplay.style.color = "#b30000";
+  } else {
+    timerDisplay.style.backgroundColor = "#fff3cd";
+    timerDisplay.style.borderColor = "#ffc107";
+    timerDisplay.style.color = "#d9534f";
+  }
+}
+
+</script>
+
 </body>
 </html>
