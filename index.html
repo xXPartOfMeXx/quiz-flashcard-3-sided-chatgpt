@@ -119,6 +119,13 @@
   </style>
 </head>
 <body>
+<div style="text-align:left; margin-top:10px; margin-bottom:20px;">
+  <button onclick="window.open('https://github.com/xXPartOfMeXx/quiz-flashcard-3-sided-chatgpt/tree/main', '_blank')" 
+          style="padding:10px 20px; margin:5px; font-size:1rem; font-weight:bold; border:none; border-radius:6px; background-color:#28a745; color:white; cursor:pointer;">
+    💻 GitHub Page of this site
+  </button>
+</div>
+
   <h1 style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT</h1>
   <h2 id="timerDisplay">⏱️ 00:00</h2>
   <p class="subtitle">
@@ -126,7 +133,7 @@
   </p>
   <p class="rednotething">
     *FORMAT BẮT BUỘC: [Đề,Câu trả lời,Lý giải] tương ứng với [Face1,Face2,Face3]<br><br>
-    Xem lại và chỉnh sửa flashcard 3 mặt <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a>. (hỗ trợ điện thoại nhưng xấu...)
+    Xem lại và chỉnh sửa flashcard 3 mặt <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a> (hỗ trợ điện thoại nhưng xấu...)
   </p>
   <p class="subtitle">Made entirely in ChatGPT (super OP) from Panana Astley</p>
   <p class="rednotethingbig">❗❗ SAU KHI TẢI FILE LÊN THÌ PHẢI NHẤN 🔁 ÍT NHẤT 1 LẦN TRƯỚC KHI BẮT ĐẦU (có thể có bug) ❗❗</p>
@@ -136,8 +143,22 @@
   <input type="number" id="timeInput" min="0.1" step="0.1" style="width:80px"><br>
   <button id="replayBtn" class="replay-btn" style="display:none;" title="Chơi lại">🔁</button>
   <p style="font-size: 1.2rem; margin-left: 20px;">
-    Tải lên file [*.csv]:<br>
-    <input style="font-size: 1.1rem;" type="file" id="csvFile" accept=".csv">
+    Tải lên file [*.csv]:
+    <label for="csvFile" 
+       style="display:inline-block; background-color:#007bff; color:white; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:1rem;">
+	   📂
+</label>
+<input type="file" id="csvFile" accept=".csv" style="display:none;">
+
+  <p id="importStatus" style="margin-left: 20px; font-weight:bold; color:green;"></p>
+
+<div style="text-align:center; margin-left:20px; margin-top:10px;">
+  <button id="startBtn" 
+          style="display:none; padding:10px 20px; font-size:1rem; font-weight:bold; border:none; border-radius:6px; background-color:#007bff; color:white; cursor:pointer;">
+    ▶️ Start Quiz
+  </button>
+</div>
+  
   </p>
 
   <br><br>
@@ -160,8 +181,49 @@ let lastQuestionLimit = null;
 
 // ========== Helpers ==========
 function parseCSV(text) {
-  return text.trim().split("\n").map(line => line.split(","));
+  const rows = [];
+  let currentRow = [];
+  let currentField = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (insideQuotes && nextChar === '"') {
+        // Escaped quote ("")
+        currentField += '"';
+        i++;
+      } else {
+        // Toggle quoted state
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      currentRow.push(currentField);
+      currentField = '';
+    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+      if (currentField || currentRow.length) {
+        currentRow.push(currentField);
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+      }
+      // handle \r\n properly
+      if (char === '\r' && nextChar === '\n') i++;
+    } else {
+      currentField += char;
+    }
+  }
+
+  if (currentField || currentRow.length) {
+    currentRow.push(currentField);
+    rows.push(currentRow);
+  }
+
+  return rows;
 }
+
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -357,6 +419,9 @@ function startQuizFromCSV(text) {
   buildQuiz(data);
 }
 
+const importStatus = document.getElementById("importStatus");
+const startBtn = document.getElementById("startBtn");
+
 document.getElementById("csvFile").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -366,10 +431,24 @@ document.getElementById("csvFile").addEventListener("change", e => {
     lastCSVData = text;
     lastQuestionLimit = parseInt(document.getElementById("limitInput").value) || null;
     replayBtn.style.display = "inline-block";
-    startQuizFromCSV(text);
+
+    // ✅ show file name in status text
+    importStatus.innerHTML = `Imported <span style="font-style:italic;">${file.name}</span> ✅`;
+
+    // show start button
+    startBtn.style.display = "inline-block";
   };
   reader.readAsText(file);
 });
+
+startBtn.addEventListener("click", () => {
+  if (lastCSVData) {
+    importStatus.textContent = "";
+    startBtn.style.display = "none";
+    startQuizFromCSV(lastCSVData);
+  }
+});
+
 
 replayBtn.addEventListener("click", () => {
   if (lastCSVData) {
