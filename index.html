@@ -98,72 +98,69 @@
 	  .answers button {
 		font-size: 1rem;      /* smaller text */
 		padding: 8px 10px;    /* less vertical padding */
-	  }
-	  .replay-btn {
-		position: fixed;
-		box-shadow: none;       /* 💥 remove any shadow */
-		outline: none;          /* remove focus outline */
-		bottom: 20px;
-		right: 20px;
-		background: none;         /* transparent background */
-		border: none;             /* remove border */
-		color: #007bff;           /* icon color */
-		font-size: 3.5rem;       /* icon size */
-		cursor: pointer;
-		z-index: 1000;
-		transition: transform 0.2s ease, color 0.2s ease;
-		opacity: 0.9;
-	  }
+	  }ё
 	}
 
   </style>
 </head>
 <body>
+<button id="resetBtn" 
+        title="Reset (F5)"
+        style="display:none; position:fixed; font-size:3.5rem; background:none; border:none; color:#007bff; cursor:pointer; z-index:1000; opacity:0.9; transition:all 0.2s ease; top: 20px; left: 48%">
+  🔄
+</button>
+
 <div style="text-align:left; margin-top:10px; margin-bottom:20px;">
+</div>
   <button onclick="window.open('https://github.com/xXPartOfMeXx/quiz-flashcard-3-sided-chatgpt/tree/main', '_blank')" 
           style="padding:10px 20px; margin:5px; font-size:1rem; font-weight:bold; border:none; border-radius:6px; background-color:#28a745; color:white; cursor:pointer;">
     💻 GitHub Page of this site
   </button>
-</div>
-
-  <h1 style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT</h1>
-  <h2 id="timerDisplay">⏱️ 00:00</h2>
+<h1 id="mainTitle" style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT</h1>
+  <div id="setupSection">
   <p class="subtitle">
-    Chọn số câu hỏi rồi tải lên file [*.csv] để bắt đầu.
+    Chọn số câu hỏi và thời gian làm bài rồi tải lên file [*.csv] để bắt đầu.
   </p>
   <p class="rednotething">
     *FORMAT BẮT BUỘC: [Đề,Câu trả lời,Lý giải] tương ứng với [Face1,Face2,Face3]<br><br>
-    Xem lại và chỉnh sửa flashcard 3 mặt <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a> (hỗ trợ điện thoại nhưng xấu...)
+    Xem lại và chỉnh sửa flashcard 3 mặt 
+    <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a>.
+    (hỗ trợ điện thoại nhưng xấu...)
   </p>
   <p class="subtitle">Made entirely in ChatGPT (super OP) from Panana Astley</p>
-  <p class="rednotethingbig">❗❗ SAU KHI TẢI FILE LÊN THÌ PHẢI NHẤN 🔁 ÍT NHẤT 1 LẦN TRƯỚC KHI BẮT ĐẦU (có thể có bug) ❗❗</p>
+  <p class="rednotethingbig">
+    ❗❗ SAU KHI TẢI FILE LÊN THÌ PHẢI NHẤN 🔁 ÍT NHẤT 1 LẦN TRƯỚC KHI BẮT ĐẦU (có thể có bug) ❗❗
+  </p>
   <label style="margin-left: 20px;" for="limitInput">Số câu hỏi: </label>
   <input type="number" id="limitInput" min="1" style="width:70px"><br>
   <label style="margin-left: 20px;" for="timeInput">Thời gian làm bài (phút): </label>
   <input type="number" id="timeInput" min="0.1" step="0.1" style="width:80px"><br>
-  <button id="replayBtn" class="replay-btn" style="display:none;" title="Chơi lại">🔁</button>
   <p style="font-size: 1.2rem; margin-left: 20px;">
     Tải lên file [*.csv]:
-    <label for="csvFile" 
-       style="display:inline-block; background-color:#007bff; color:white; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:1rem;">
-	   📂
-</label>
-<input type="file" id="csvFile" accept=".csv" style="display:none;">
-
-  <p id="importStatus" style="margin-left: 20px; font-weight:bold; color:green;"></p>
-
-<div style="text-align:center; margin-left:20px; margin-top:10px;">
-  <button id="startBtn" 
-          style="display:none; padding:10px 20px; font-size:1rem; font-weight:bold; border:none; border-radius:6px; background-color:#007bff; color:white; cursor:pointer;">
-    ▶️ Start Quiz
-  </button>
-</div>
-  
+    <label for="csvFile"
+           style="display:inline-block; background-color:#007bff; color:white; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:1rem; margin-top:5px;">
+      📂
+    </label>
+    <input type="file" id="csvFile" accept=".csv" style="display:none;">
   </p>
 
+  <p id="importStatus" style="margin-left: 20px; font-weight:bold; color:green; font-size:1.1rem;"></p>
+  <div style="margin-left:20px; margin-top:10px;">
+    <button id="startBtn"
+            style="display:none; padding:10px 20px; font-size:1rem; font-weight:bold; border:none; border-radius:6px; background-color:#007bff; color:white; cursor:pointer;">
+      ▶️ Start Quiz
+    </button>
+  </div>
+</div>
+
+  </p>
+
+</div>
   <br><br>
   <div id="quiz"></div>
   <div id="scoreBox"></div>
+    <h2 id="timerDisplay">⏱️ 00:00</h2>
+  <button id="replayBtn" class="replay-btn" style="display:none;" title="Chơi lại">🔁</button>
 
 <script>
 let timerInterval = null;
@@ -429,25 +426,39 @@ document.getElementById("csvFile").addEventListener("change", e => {
   reader.onload = evt => {
     const text = evt.target.result;
     lastCSVData = text;
+    fileNameGlobal = file.name.replace(/\.csv$/i, "").replace(/`/g, '"');
     lastQuestionLimit = parseInt(document.getElementById("limitInput").value) || null;
     replayBtn.style.display = "inline-block";
 
-    // ✅ show file name in status text
     importStatus.innerHTML = `Imported <span style="font-style:italic;">${file.name}</span> ✅`;
-
-    // show start button
     startBtn.style.display = "inline-block";
   };
   reader.readAsText(file);
 });
 
+
+let fileNameGlobal = "";
+
 startBtn.addEventListener("click", () => {
   if (lastCSVData) {
+    document.getElementById("setupSection").style.display = "none";
+
+    const mainTitle = document.getElementById("mainTitle");
+    mainTitle.textContent = fileNameGlobal || "Quiz";
+    mainTitle.style.textAlign = "center";
+    mainTitle.style.marginBottom = "20px";
+    mainTitle.style.display = "block";
+
+    // ✅ Show reset button now
+    resetBtn.style.display = "inline-block";
+
     importStatus.textContent = "";
     startBtn.style.display = "none";
     startQuizFromCSV(lastCSVData);
   }
 });
+
+
 
 
 replayBtn.addEventListener("click", () => {
@@ -487,6 +498,11 @@ function updateTimerDisplay() {
     timerDisplay.style.color = "#d9534f";
   }
 }
+// 🔄 Reset button behavior
+const resetBtn = document.getElementById("resetBtn");
+resetBtn.addEventListener("click", () => {
+  location.reload(); // behaves like F5
+});
 
 </script>
 
