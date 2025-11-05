@@ -6,7 +6,6 @@ NOTE:
 - Future plan:
   + Let you choose which face is the question, answer, and explanation (currently Face 1/2/3 by default)
   + A matching mode? (not multiplayer)
-  + Title with the file name (Fancy~)
   + Supports 3 language! (**Vietnamese - current language**, English, Russian)
 - Currently it has several drawbacks and stuffs, if u find any, contact me at [Panana Astley](https://www.facebook.com/panana.astley) on Facebook
 
