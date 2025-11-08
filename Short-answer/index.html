@@ -5,6 +5,29 @@
   <meta charset="UTF-8">
   <title>ÔN TẬP FLASHCARD 3 MẶT (TỰ LUẬN)</title>
   <style>
+  /* Make labels and input boxes match MCQ site */
+  label {
+    font-size: 1.0rem;
+    font-weight: 600;
+  }
+  input[type="number"],
+  input[type="file"],
+  input.answer-input {
+    font-size: 1.0rem;
+    padding: 4px 6px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  #replayLimit,
+  #replayTime {
+    font-size: 1.0rem;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+
   #confirmReplay:hover { background-color: #0056b3 !important; }
   #cancelReplay:hover { background-color: #b02a37 !important; }
     /* Reuse styles from the MCQ version */
@@ -16,7 +39,7 @@
     .question-box { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     input.answer-input {
       display: block;
-      width: 100%;
+      width: 97%; //vl anh jack
       font-size: 1.4rem;
       padding: 10px;
       margin-top: 10px;
@@ -323,6 +346,8 @@ document.getElementById("replayBtn").addEventListener("click", () => {
   popup.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
   popup.style.zIndex = "2000";
   popup.style.textAlign = "center";
+  popup.style.fontWeight = "bold";
+  popup.style.fontSize = "1.05rem";
   popup.innerHTML = `
     <h3>🔁 Chơi lại</h3>
     <label for="replayLimit">Số câu hỏi:</label><br>
@@ -333,6 +358,20 @@ document.getElementById("replayBtn").addEventListener("click", () => {
     <button id="cancelReplay" style="margin-left:8px; background-color:#dc3545; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Hủy</button>
   `;
   document.body.appendChild(popup);
+
+  // Add dim overlay behind the popup
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100%";
+  overlay.style.height = "100%";
+  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.4)";
+  overlay.style.zIndex = "1999";
+  document.body.appendChild(overlay);
+
+  document.body.appendChild(popup);
+
 
   const replayLimit = document.getElementById("replayLimit");
   const replayTime = document.getElementById("replayTime");
