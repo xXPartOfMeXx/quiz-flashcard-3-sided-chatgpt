@@ -5,7 +5,7 @@ NOTE:
 - I will be likely to add a feature to import your flashcard set in the [Creator](https://xxpartofmexx.github.io/3faceflashcard-creator/) site directly from the button in it (Near future)
 - Future plan:
   + Let you choose which face is the question, answer, and explanation (currently Face 1/2/3 by default)
-  + A matching mode? (not multiplayer)
+  + A matching mode? (not multiplayer) (SIKE I MADE FREE RESPONDING FIRST LMAO)
   + Supports 3 language! (**Vietnamese - current language**, English, Russian)
 - Currently it has several drawbacks and stuffs, if u find any, contact me at [Panana Astley](https://www.facebook.com/panana.astley) on Facebook
 
