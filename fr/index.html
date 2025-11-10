@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=0.8">
   <meta charset="UTF-8">
-  <title>ÔN TẬP FLASHCARD 3 MẶT - TỰ LUẬN</title>
+  <title>ÔN TẬP FLASHCARD 3 MẶT (TỰ LUẬN)</title>
   <style>
   /* Make labels and input boxes match MCQ site */
   label {
@@ -84,7 +84,7 @@
   💻 GitHub Page of this site
 </button>
 
-<h1 id="mainTitle" style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT - TỰ LUẬN</h1>
+<h1 id="mainTitle" style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT (TỰ LUẬN)</h1>
 
 <div id="setupSection">
 <p class="subtitle">
@@ -361,6 +361,7 @@ document.getElementById("replayBtn").addEventListener("click", () => {
 
   // Add dim overlay behind the popup
   const overlay = document.createElement("div");
+  overlay.id = "replayOverlay";
   overlay.style.position = "fixed";
   overlay.style.top = "0";
   overlay.style.left = "0";
@@ -378,11 +379,13 @@ document.getElementById("replayBtn").addEventListener("click", () => {
   const confirmBtn = document.getElementById("confirmReplay");
   const cancelBtn = document.getElementById("cancelReplay");
 
-  // 🧠 Helper to close popup
-  const closePopup = () => {
-    document.removeEventListener("keydown", keyHandler);
-    if (popup.parentNode) document.body.removeChild(popup);
-  };
+const closePopup = () => {
+  document.removeEventListener("keydown", keyHandler);
+  if (popup.parentNode) document.body.removeChild(popup);
+  const overlayEl = document.getElementById("replayOverlay");
+  if (overlayEl && overlayEl.parentNode) document.body.removeChild(overlayEl);
+};
+
 
   // 🧠 Handle replay confirmation
   const startReplay = () => {
@@ -431,5 +434,3 @@ document.getElementById("resetBtn").addEventListener("click", () => location.rel
 </script>
 </body>
 </html>
-
-
