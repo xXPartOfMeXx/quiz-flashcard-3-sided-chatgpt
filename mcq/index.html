@@ -1,580 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=0.8">
-  <meta charset="UTF-8">
-  <title>Quiz from CSV - MCQ</title>
-  <style>
-  #confirmReplay:hover { background-color: #0056b3 !important; }
-  #cancelReplay:hover { background-color: #b02a37 !important; }
-
-	 /* Make form labels and inputs bigger */
-	label {
-	  font-size: 1.0rem;      /* 🔼 bigger text for “Số câu hỏi”, etc. */
-	  font-weight: 600;
-	}
-
-  input[type="number"],
-  input[type="file"] {
-    font-size: 1.0rem;
-    padding: 4px 6px;
-    margin-top: 5px;
-    border-radius: 6px;    /* 🔥 add smooth corners */
-    border: 1px solid #ccc;
-  }
-
-	#timerDisplay {
-	  position: fixed;
-	  top: 20px;             /* distance from top edge */
-	  right: 30px;           /* distance from right edge */
-	  background-color: #fff3cd;
-	  border: 2px solid #ffc107;
-	  color: #d9534f;
-	  padding: 10px 15px;
-	  border-radius: 10px;
-	  font-weight: bold;
-	  font-size: 2rem;
-	  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-	  z-index: 1000;
-	}
-
-	.replay-btn {
-	  position: fixed;       /* makes it stay in place when scrolling */
-	  box-shadow: none !important;       /* 💥 remove any shadow */
-	  outline: none !important;          /* remove focus outline */
-	  bottom: 20px;          /* distance from bottom edge */
-	  right: 20px;           /* distance from right edge */
-	  padding: 12px 18px;
-	  background: none;
-	  border: none;
-	  color: white;
-	  width: 100px;
-	  height: 100px;	
-	  font-size: 4rem;
-	  border: none;
-	  cursor: pointer;
-	  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-	  z-index: 1000;         /* ensures it stays above other content */
-	  opacity: 0.9;
-	  transition: all 0.2s ease;
-	}
-
-	.replay-btn:hover {
-	  opacity: 1;
-	  background:none;
-	  box-shadow: none;       /* 💥 remove any shadow */
-	  outline: none;          /* remove focus outline */
-	  transform: scale(1.1);
-	}
-
-    body { font-family: Arial, sans-serif; margin: 30px; background: #f9f9f9; }
-    h2 { margin-top: 20px; }
-	.subtitle {
-      font-size: 0.9rem;
-      color: #555;
-      font-style: italic;
-      margin-bottom: 15px;
-      margin-left: 20px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEV BRAIN MELT 💀</title>
+<style>
+    @keyframes shake {
+        0% { transform: translate(0px, 0px) rotate(0deg); }
+        10% { transform: translate(-5px, 5px) rotate(-5deg); }
+        20% { transform: translate(5px, -5px) rotate(5deg); }
+        30% { transform: translate(-5px, 5px) rotate(-5deg); }
+        40% { transform: translate(5px, -5px) rotate(5deg); }
+        50% { transform: translate(-5px, 5px) rotate(-5deg); }
+        60% { transform: translate(5px, -5px) rotate(5deg); }
+        70% { transform: translate(-5px, 5px) rotate(-5deg); }
+        80% { transform: translate(5px, -5px) rotate(5deg); }
+        90% { transform: translate(-5px, 5px) rotate(-5deg); }
+        100% { transform: translate(0px, 0px) rotate(0deg); }
     }
-	.rednotething {
-      margin-left: 20px; 
-      font-size:0.9rem; 
-      font-style:italic; 
-      font-weight:bold; 
-      color:#FF0000;
-    }
-	.rednotethingbig {
-      margin-left: 20px; 
-      font-size:1.2rem; 
-      font-style:italic; 
-      font-weight:bold; 
-      color:#FF0000;
-    }
-    .question-box { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .answers button { display: block; margin: 5px 0; padding: 16px 20px; font-size: 1.5rem; width: 100%; border: 1px solid #ccc; border-radius: 5px; background: #eee; cursor: pointer; }
-    .answers button:hover {transform: scale(1.05);font-size: 1.7rem;}
-    .correct { background: #c8f7c5 !important; border-color: #27ae60 !important; }
-    .wrong { background: #f7c5c5 !important; border-color: #e74c3c !important; }
-    .feedback { margin-top: 10px; font-weight: bold; white-space: pre-line; }
-    #scoreBox { margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; font-size: 1.2em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  
-	  /* Make answer buttons smaller on phones */
-	@media (max-width: 600px) {
-	  .answers button {
-		font-size: 1rem;      /* smaller text */
-		padding: 8px 10px;    /* less vertical padding */
-	  }ё
-	}
 
-  </style>
+    @keyframes rainbow {
+        0% { color: red; }
+        14% { color: orange; }
+        28% { color: yellow; }
+        42% { color: green; }
+        56% { color: blue; }
+        70% { color: indigo; }
+        84% { color: violet; }
+        100% { color: red; }
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background: black;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .container {
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 3em;
+        animation: rainbow 1s infinite;
+        text-shadow: 0 0 10px white, 0 0 20px red, 0 0 30px yellow;
+        display: inline-block;
+    }
+
+    .glitch {
+        display: inline-block;
+        animation: shake 0.5s infinite;
+        position: relative;
+        color: white;
+        font-weight: bold;
+    }
+
+    .glitch::before, .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        text-shadow: -2px 0 red, 2px 0 blue;
+        clip: rect(0, 900px, 0, 0);
+    }
+
+    .glitch::before {
+        animation: glitchTop 1s infinite linear alternate-reverse;
+    }
+
+    .glitch::after {
+        animation: glitchBottom 1s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitchTop {
+        0% { clip: rect(0, 9999px, 0, 0); transform: translate(-3px, -3px); }
+        25% { clip: rect(0, 9999px, 50px, 0); transform: translate(3px, 3px); }
+        50% { clip: rect(0, 9999px, 25px, 0); transform: translate(-3px, 0); }
+        75% { clip: rect(0, 9999px, 50px, 0); transform: translate(3px, -3px); }
+        100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0); }
+    }
+
+    @keyframes glitchBottom {
+        0% { clip: rect(0, 9999px, 0, 0); transform: translate(3px, 3px); }
+        25% { clip: rect(25px, 9999px, 75px, 0); transform: translate(-3px, -3px); }
+        50% { clip: rect(50px, 9999px, 100px, 0); transform: translate(0, 3px); }
+        75% { clip: rect(25px, 9999px, 50px, 0); transform: translate(-3px, 0); }
+        100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0); }
+    }
+
+    p {
+        font-size: 1.5em;
+        animation: rainbow 0.8s infinite alternate;
+        line-height: 1.5;
+        text-shadow: 0 0 5px white;
+        margin-top: 20px;
+    }
+
+    .banana {
+        position: absolute;
+        font-size: 2em;
+        animation: floatBanana 1s infinite alternate;
+    }
+
+    @keyframes floatBanana {
+        0% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(15deg); }
+        100% { transform: translateY(0) rotate(-15deg); }
+    }
+</style>
 </head>
 <body>
-<button id="resetBtn" 
-        title="Reset"
-        style="display:none; position:fixed; font-size:3.5rem; background:none; border:none; color:#007bff; cursor:pointer; z-index:1000; opacity:0.9; transition:all 0.2s ease; top: 20px; left: 48%">
-  🔄
-</button>
+    <div class="container">
+        <h1 class="glitch" data-text="SHIET!">SHIET!</h1>
+        <p>This website has unfixable bugs and us devs are <span style="color:#ff00ff;">fucking</span> our last braincells to work on.<br>
+        Please come back later.</p>
+    </div>
 
-<div style="text-align:left; margin-top:10px; margin-bottom:20px;">
-</div>
-  <button onclick="window.open('https://github.com/xXPartOfMeXx/quiz-flashcard-3-sided-chatgpt/tree/main', '_blank')" 
-          style="padding:10px 20px; margin:5px; font-size:1rem; font-weight:bold; border:none; border-radius:6px; background-color:#28a745; color:white; cursor:pointer;">
-    💻 GitHub Page of this site
-  </button>
-<h1 id="mainTitle" style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT - TRẮC NGHIỆM</h1>
-  <div id="setupSection">
-  <p class="subtitle">
-    Chọn số câu hỏi và thời gian làm bài rồi tải lên file [*.csv] để bắt đầu.
-  </p>
-  <p class="rednotething">
-    *FORMAT BẮT BUỘC: [Đề,Câu trả lời,Lý giải] tương ứng với [Face1,Face2,Face3]<br><br>
-    Xem lại và chỉnh sửa flashcard 3 mặt 
-    <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a>.
-    (hỗ trợ điện thoại nhưng xấu...)
-  </p>
-  <label style="margin-left: 20px;" for="limitInput">Số câu hỏi: </label>
-  <input type="number" id="limitInput" min="1" style="width:70px"><br>
-  <label style="margin-left: 20px;" for="timeInput">Thời gian làm bài (phút): </label>
-  <input type="number" id="timeInput" min="0.1" step="0.1" style="width:80px"><br>
-  <p style="font-size: 1.2rem; margin-left: 20px;">
-    Tải lên file [*.csv]:
-    <label for="csvFile"
-           style="display:inline-block; background-color:#007bff; color:white; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:1rem; margin-top:5px;">
-      📂
-    </label>
-    <input type="file" id="csvFile" accept=".csv" style="display:none;">
-  </p>
-
-  <p id="importStatus" style="margin-left: 20px; font-weight:bold; color:green; font-size:1.1rem;"></p>
-  <div style="margin-left:20px; margin-top:10px;">
-    <button id="startBtn"
-            style="display:none; padding:10px 20px; font-size:1rem; font-weight:bold; border:none; border-radius:6px; background-color:#007bff; color:white; cursor:pointer;">
-      ▶️ Start Quiz
-    </button>
-  </div>
-</div>
-
-  </p>
-
-</div>
-  <br><br>
-  <div id="quiz"></div>
-  <div id="scoreBox"></div>
-    <h2 id="timerDisplay">⏱️ 00:00</h2>
-  <button id="replayBtn" class="replay-btn" style="display:none;" title="Chơi lại">🔁</button>
-
-<script>
-let timerInterval = null;
-let quizEnded = false;
-let remainingSeconds = 0;
-let quizStartTime = null;
-
-// 🧩 NEW global score tracking
-let correctCountGlobal = 0;
-let totalQuestionsGlobal = 0;
-
-const replayBtn = document.getElementById("replayBtn");
-let lastCSVData = null;
-let lastQuestionLimit = null;
-
-// ========== Helpers ==========
-function parseCSV(text) {
-  const rows = [];
-  let currentRow = [];
-  let currentField = '';
-  let insideQuotes = false;
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const nextChar = text[i + 1];
-
-    if (char === '"') {
-      if (insideQuotes && nextChar === '"') {
-        // Escaped quote ("")
-        currentField += '"';
-        i++;
-      } else {
-        // Toggle quoted state
-        insideQuotes = !insideQuotes;
-      }
-    } else if (char === ',' && !insideQuotes) {
-      currentRow.push(currentField);
-      currentField = '';
-    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
-      if (currentField || currentRow.length) {
-        currentRow.push(currentField);
-        rows.push(currentRow);
-        currentRow = [];
-        currentField = '';
-      }
-      // handle \r\n properly
-      if (char === '\r' && nextChar === '\n') i++;
-    } else {
-      currentField += char;
-    }
-  }
-
-  if (currentField || currentRow.length) {
-    currentRow.push(currentField);
-    rows.push(currentRow);
-  }
-
-  return rows;
-}
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-// ========== Build Quiz ==========
-function buildQuiz(data) {
-  const quizContainer = document.getElementById("quiz");
-  const scoreBox = document.getElementById("scoreBox");
-  quizContainer.innerHTML = "";
-  scoreBox.innerHTML = "";
-
-  let correctCount = 0;
-  let answeredCount = 0;
-
-  const limit = parseInt(document.getElementById("limitInput").value) || data.length;
-  const totalQuestions = Math.min(limit, data.length);
-  totalQuestionsGlobal = totalQuestions; // store globally
-
-  // --- TIMER SETUP ---
-  const timerDisplay = document.getElementById("timerDisplay");
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timerDisplay.style.display = "none";
-  quizEnded = false;
-
-  const timeLimitMinutes = parseFloat(document.getElementById("timeInput").value);
-  if (timeLimitMinutes && timeLimitMinutes > 0) {
-    remainingSeconds = timeLimitMinutes * 60;
-    quizStartTime = Date.now();
-    timerDisplay.style.display = "block";
-    updateTimerDisplay();
-
-    timerInterval = setInterval(() => {
-      if (quizEnded) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        return;
-      }
-      remainingSeconds--;
-      updateTimerDisplay();
-      if (remainingSeconds <= 0) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        quizEnded = true;
-        // 👇 use global score
-        correctCountGlobal = correctCount;
-        endQuizEarly();
-      }
-    }, 1000);
-  } else {
-    quizStartTime = Date.now();
-  }
-
-  const selectedQuestions = shuffle([...data]).slice(0, totalQuestions);
-  const allAnswers = data.map(d => d[1]);
-
-  selectedQuestions.forEach(([question, correctAnswer, definition], qIndex) => {
-    const questionBox = document.createElement("div");
-    questionBox.className = "question-box";
-
-    const qText = document.createElement("h2");
-    qText.textContent = `Q${qIndex + 1}: ${question}`;
-    questionBox.appendChild(qText);
-
-    // Unique answers
-    const uniqueAnswers = new Set();
-    uniqueAnswers.add(correctAnswer.toLowerCase());
-    shuffle(allAnswers).forEach(a => {
-      if (uniqueAnswers.size < 4 &&
-          a.toLowerCase() !== correctAnswer.toLowerCase() &&
-          !uniqueAnswers.has(a.toLowerCase())) {
-        uniqueAnswers.add(a.toLowerCase());
-      }
-    });
-    const options = shuffle(
-      [...uniqueAnswers].map(txt =>
-        allAnswers.find(a => a.toLowerCase() === txt) || txt
-      )
-    );
-
-    const answersDiv = document.createElement("div");
-    answersDiv.className = "answers";
-    const feedback = document.createElement("div");
-    feedback.className = "feedback";
-
-    options.forEach(option => {
-      const btn = document.createElement("button");
-      btn.textContent = option;
-
-      btn.onclick = () => {
-        [...answersDiv.children].forEach(b => b.disabled = true);
-
-        if (quizEnded) {
-          // Time's up → show feedback only
-          if (option.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
-            btn.classList.add("correct");
-            feedback.textContent = `✅ Chính xác!\n${explanation}`;
-            feedback.style.color = "green";
-          } else {
-            btn.classList.add("wrong");
-            feedback.textContent = `❌ Sai rồi!\nĐáp án đúng: ${correct}\n${explanation}`;
-            feedback.style.color = "red";
-          }
-          return;
+    <script>
+        function spawnBanana() {
+            const banana = document.createElement('div');
+            banana.classList.add('banana');
+            banana.textContent = '🍌';
+            banana.style.left = Math.random() * window.innerWidth + 'px';
+            banana.style.top = Math.random() * window.innerHeight + 'px';
+            banana.style.fontSize = (20 + Math.random() * 40) + 'px';
+            document.body.appendChild(banana);
+            setTimeout(() => banana.remove(), 3000);
         }
 
-        // Normal answer
-        if (option.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
-          btn.classList.add("correct");
-          feedback.textContent = `✅ Correct!\nDefinition: ${definition}`;
-          feedback.style.color = "green";
-          correctCount++;
-        } else {
-          btn.classList.add("wrong");
-          feedback.textContent = `❌ Wrong.\nCorrect answer: ${correctAnswer}\nDefinition: ${definition}`;
-          feedback.style.color = "red";
-        }
-
-        answeredCount++;
-
-        if (answeredCount === totalQuestions) {
-          quizEnded = true;
-          clearInterval(timerInterval);
-          timerInterval = null;
-          correctCountGlobal = correctCount;
-          endQuizEarly();
-        }
-      };
-
-      answersDiv.appendChild(btn);
-    });
-
-    questionBox.appendChild(answersDiv);
-    questionBox.appendChild(feedback);
-    quizContainer.appendChild(questionBox);
-  });
-}
-
-// ========== Timer Display ==========
-function updateTimerDisplay() {
-  const timerDisplay = document.getElementById("timerDisplay");
-  const mins = Math.floor(remainingSeconds / 60);
-  const secs = remainingSeconds % 60;
-  timerDisplay.textContent = `⏱️ ${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
-}
-
-// ========== End Quiz Early ==========
-function endQuizEarly() {
-  const scoreBox = document.getElementById("scoreBox");
-  const timerDisplay = document.getElementById("timerDisplay");
-
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timerDisplay.style.display = "none";
-  quizEnded = true;
-
-  const totalTime = ((Date.now() - quizStartTime) / 1000).toFixed(1);
-  const percentage = Math.round((correctCountGlobal / totalQuestionsGlobal) * 100);
-
-  // ✅ Check if the user actually set a timer
-  const timeLimitInput = parseFloat(document.getElementById("timeInput").value);
-
-  let timeMessage;
-  if (timeLimitInput && remainingSeconds <= 0) {
-    // only show easter egg if timer was set and time ran out
-    timeMessage = "YOU'RE TAKING TOO LONG 🎃";
-  } else {
-    timeMessage = `Thời gian làm bài: ${totalTime} giây`;
-  }
-
-  let resultMessage = "";
-  if (percentage >= 75) {
-    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). You’re a genius! 🎉🎉`;
-  } else if (percentage >= 50 && percentage < 75) {
-    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). Congratulations! 🎉`;
-  } else if (percentage > 0 && percentage < 50) {
-    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). We Asians are disappointed in you 😡👿`;
-  } else {
-    resultMessage = `ARE YOU DUMB?`;
-  }
-
-  scoreBox.innerHTML = `${resultMessage}<br>${timeMessage}`;
-}
-
-
-// ========== CSV Loader & Replay ==========
-function startQuizFromCSV(text) {
-  const data = parseCSV(text);
-  buildQuiz(data);
-}
-
-const importStatus = document.getElementById("importStatus");
-const startBtn = document.getElementById("startBtn");
-
-document.getElementById("csvFile").addEventListener("change", e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = evt => {
-    const text = evt.target.result;
-    lastCSVData = text;
-    fileNameGlobal = file.name.replace(/\.csv$/i, "").replace(/`/g, '"');
-    lastQuestionLimit = parseInt(document.getElementById("limitInput").value) || null;
-    replayBtn.style.display = "inline-block";
-
-    importStatus.innerHTML = `Imported <span style="font-style:italic;">${file.name}</span> ✅`;
-    startBtn.style.display = "inline-block";
-  };
-  reader.readAsText(file);
-});
-
-
-let fileNameGlobal = "";
-
-startBtn.addEventListener("click", () => {
-  if (lastCSVData) {
-    document.getElementById("setupSection").style.display = "none";
-
-    const mainTitle = document.getElementById("mainTitle");
-    mainTitle.textContent = fileNameGlobal || "Quiz";
-    mainTitle.style.textAlign = "center";
-    mainTitle.style.marginBottom = "20px";
-    mainTitle.style.display = "block";
-
-    // ✅ Show reset button now
-    resetBtn.style.display = "inline-block";
-
-    importStatus.textContent = "";
-    startBtn.style.display = "none";
-    startQuizFromCSV(lastCSVData);
-  }
-});
-
-
-
-
-replayBtn.addEventListener("click", () => {
-  if (!lastCSVData) return;
-
-  // 🧮 Create popup form
-  const popup = document.createElement("div");
-  popup.style.position = "fixed";
-  popup.style.top = "50%";
-  popup.style.left = "50%";
-  popup.style.transform = "translate(-50%, -50%)";
-  popup.style.background = "#fff";
-  popup.style.padding = "20px 25px";
-  popup.style.borderRadius = "10px";
-  popup.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
-  popup.style.zIndex = "2000";
-  popup.style.textAlign = "center";
-  popup.innerHTML = `
-    <h3>🔁 Chơi lại</h3>
-    <label for="replayLimit">Số câu hỏi:</label><br>
-    <input type="number" id="replayLimit" min="1" value="${document.getElementById("limitInput").value || ''}" style="width:80px; margin:5px;"><br>
-    <label for="replayTime">Thời gian làm bài (phút):</label><br>
-    <input type="number" id="replayTime" min="0.1" step="0.1" value="${document.getElementById("timeInput").value || ''}" style="width:80px; margin:5px;"><br><br>
-    <button id="confirmReplay" style="background-color:#007bff; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Bắt đầu lại</button>
-    <button id="cancelReplay" style="margin-left:8px; background-color:#dc3545; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Hủy</button>
-  `;
-
-  // add overlay for dim background
-  const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.top = "0";
-  overlay.style.left = "0";
-  overlay.style.width = "100%";
-  overlay.style.height = "100%";
-  overlay.style.backgroundColor = "rgba(0,0,0,0.4)";
-  overlay.style.zIndex = "1999";
-
-  document.body.appendChild(overlay);
-  document.body.appendChild(popup);
-
-  const replayLimit = document.getElementById("replayLimit");
-  const replayTime = document.getElementById("replayTime");
-  const confirmBtn = document.getElementById("confirmReplay");
-  const cancelBtn = document.getElementById("cancelReplay");
-
-  const closePopup = () => {
-    document.removeEventListener("keydown", keyHandler);
-    if (popup.parentNode) popup.remove();
-    if (overlay.parentNode) overlay.remove();
-  };
-
-  const startReplay = () => {
-    const newLimit = parseInt(replayLimit.value);
-    const newTime = parseFloat(replayTime.value);
-
-    if (!isNaN(newLimit)) document.getElementById("limitInput").value = newLimit;
-    if (!isNaN(newTime)) document.getElementById("timeInput").value = newTime;
-
-    document.getElementById("quiz").innerHTML = "";
-    document.getElementById("scoreBox").textContent = "";
-    document.getElementById("timerDisplay").style.display = "none";
-    clearInterval(timerInterval);
-    timerInterval = null;
-    quizEnded = false;
-    correctCountGlobal = 0;
-    totalQuestionsGlobal = 0;
-
-    closePopup();
-    startQuizFromCSV(lastCSVData);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  // keyboard support
-  const keyHandler = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      startReplay();
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      closePopup();
-    }
-  };
-  document.addEventListener("keydown", keyHandler);
-
-  confirmBtn.onclick = startReplay;
-  cancelBtn.onclick = closePopup;
-
-  setTimeout(() => replayLimit.focus(), 100);
-});
-
-
-function updateTimerDisplay() {
-  const timerDisplay = document.getElementById("timerDisplay");
-  const mins = Math.floor(remainingSeconds / 60);
-  const secs = remainingSeconds % 60;
-  timerDisplay.textContent = `⏱️ ${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
-  
-  // Flash red in last 10 seconds
-  if (remainingSeconds <= 10) {
-    timerDisplay.style.backgroundColor = "#f8d7da";
-    timerDisplay.style.borderColor = "#dc3545";
-    timerDisplay.style.color = "#b30000";
-  } else {
-    timerDisplay.style.backgroundColor = "#fff3cd";
-    timerDisplay.style.borderColor = "#ffc107";
-    timerDisplay.style.color = "#d9534f";
-  }
-}
-// 🔄 Reset button behavior
-const resetBtn = document.getElementById("resetBtn");
-resetBtn.addEventListener("click", () => {
-  location.reload(); // behaves like F5
-});
-
-</script>
-
+        setInterval(spawnBanana, 50); // spawn a banana every 0.3s
+    </script>
 </body>
 </html>
