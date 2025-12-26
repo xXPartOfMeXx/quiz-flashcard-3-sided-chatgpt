@@ -1,139 +1,1281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DEV BRAIN MELT 💀</title>
-<style>
-    @keyframes shake {
-        0% { transform: translate(0px, 0px) rotate(0deg); }
-        10% { transform: translate(-5px, 5px) rotate(-5deg); }
-        20% { transform: translate(5px, -5px) rotate(5deg); }
-        30% { transform: translate(-5px, 5px) rotate(-5deg); }
-        40% { transform: translate(5px, -5px) rotate(5deg); }
-        50% { transform: translate(-5px, 5px) rotate(-5deg); }
-        60% { transform: translate(5px, -5px) rotate(5deg); }
-        70% { transform: translate(-5px, 5px) rotate(-5deg); }
-        80% { transform: translate(5px, -5px) rotate(5deg); }
-        90% { transform: translate(-5px, 5px) rotate(-5deg); }
-        100% { transform: translate(0px, 0px) rotate(0deg); }
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <meta charset="UTF-8">
+  <title>ÔN TẬP FLASHCARD 3 MẶT - TRẮC NGHIỆM</title>
+  <style>
 
-    @keyframes rainbow {
-        0% { color: red; }
-        14% { color: orange; }
-        28% { color: yellow; }
-        42% { color: green; }
-        56% { color: blue; }
-        70% { color: indigo; }
-        84% { color: violet; }
-        100% { color: red; }
-    }
+/* 🌙 Replay Popup — Dark Cyan Theme */
+#replayOverlay {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+}
 
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background: black;
-        font-family: "Comic Sans MS", cursive, sans-serif;
-        overflow: hidden;
-        position: relative;
-    }
+#replayOverlay .popup-box,
+#replayOverlay #popup {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 20px 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(56,189,248,0.3);
+}
 
-    .container {
-        text-align: center;
-    }
+/* Popup faces */
+.popup-face {
+  background: #1e293b;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: grab;
+  user-select: none;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 6px rgba(56,189,248,0.3);
+}
+.popup-face:hover {
+  background: #0f172a;
+  transform: scale(1.05);
+}
+.popup-face:active { transform: scale(0.95); }
+.popup-face.used {
+  background: #475569 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
 
-    h1 {
-        font-size: 3em;
-        animation: rainbow 1s infinite;
-        text-shadow: 0 0 10px white, 0 0 20px red, 0 0 30px yellow;
-        display: inline-block;
-    }
+/* Popup drop zones */
+.popup-zone {
+  width: 160px;
+  height: 60px;
+  background: #1a2333;
+  border: 2px dashed #475569;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8fafc;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.popup-zone.filled {
+  border-style: solid;
+  background: #14532d;
+  border-color: #22c55e;
+}
+.popup-zone.dragover {
+  background: #0f172a;
+  border-color: #38bdf8;
+}
 
-    .glitch {
-        display: inline-block;
-        animation: shake 0.5s infinite;
-        position: relative;
-        color: white;
-        font-weight: bold;
-    }
+/* Popup buttons */
+#confirmReplay, #cancelReplay {
+  background-color: #1a2333;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(56,189,248,0.3);
+}
 
-    .glitch::before, .glitch::after {
-        content: attr(data-text);
-        position: absolute;
-        left: 0;
-        text-shadow: -2px 0 red, 2px 0 blue;
-        clip: rect(0, 900px, 0, 0);
-    }
+#confirmReplay:hover, #cancelReplay:hover {
+  background-color: #0f172a;
+  box-shadow: 0 0 12px rgba(56,189,248,0.6);
+}
+#cancelReplay {
+  color: #ef4444;
+  border-color: #ef4444;
+  box-shadow: 0 0 8px rgba(239,68,68,0.3);
+}
+#cancelReplay:hover {
+  background-color: #1a0b0b;
+  color: #f87171;
+  box-shadow: 0 0 12px rgba(239,68,68,0.6);
+}
 
-    .glitch::before {
-        animation: glitchTop 1s infinite linear alternate-reverse;
-    }
+/* Popup inputs */
+#replayLimit, #replayTime {
+  font-size: 1rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  text-align: center;
+}
+#replayLimit:focus, #replayTime:focus {
+  border-color: #38bdf8;
+  outline: none;
+  background-color: #1e293b;
+}
 
-    .glitch::after {
-        animation: glitchBottom 1s infinite linear alternate-reverse;
-    }
 
-    @keyframes glitchTop {
-        0% { clip: rect(0, 9999px, 0, 0); transform: translate(-3px, -3px); }
-        25% { clip: rect(0, 9999px, 50px, 0); transform: translate(3px, 3px); }
-        50% { clip: rect(0, 9999px, 25px, 0); transform: translate(-3px, 0); }
-        75% { clip: rect(0, 9999px, 50px, 0); transform: translate(3px, -3px); }
-        100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0); }
-    }
+/* Base layout */
+body {
+  font-family: Arial, sans-serif;
+  margin: 30px;
+  background: #0f172a;
+  color: #f8fafc;
+}
 
-    @keyframes glitchBottom {
-        0% { clip: rect(0, 9999px, 0, 0); transform: translate(3px, 3px); }
-        25% { clip: rect(25px, 9999px, 75px, 0); transform: translate(-3px, -3px); }
-        50% { clip: rect(50px, 9999px, 100px, 0); transform: translate(0, 3px); }
-        75% { clip: rect(25px, 9999px, 50px, 0); transform: translate(-3px, 0); }
-        100% { clip: rect(0, 9999px, 0, 0); transform: translate(0, 0); }
-    }
+h1, h2, label, p, a, span {
+  color: #f8fafc;
+}
 
-    p {
-        font-size: 1.5em;
-        animation: rainbow 0.8s infinite alternate;
-        line-height: 1.5;
-        text-shadow: 0 0 5px white;
-        margin-top: 20px;
-    }
+a {
+  color: #38bdf8;
+  text-decoration: none;
+}
+a:hover {
+  color: #0ea5e9;
+  text-decoration: underline;
+}
 
-    .banana {
-        position: absolute;
-        font-size: 2em;
-        animation: floatBanana 1s infinite alternate;
-    }
+/* Buttons — cyan glow theme */
+button {
+  background-color: #1a2333;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  margin: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(56,189,248,0.3);
+}
+button:hover {
+  transform: scale(1.05);
+  background-color: #0f172a;
+  box-shadow: 0 0 12px rgba(56,189,248,0.6);
+}
 
-    @keyframes floatBanana {
-        0% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(15deg); }
-        100% { transform: translateY(0) rotate(-15deg); }
-    }
+#upload {
+  display: inline-block !important;
+  transform-origin: center center;
+  will-change: transform;
+  background-color: #1a2333;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  margin: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(56,189,248,0.3);
+}
+#upload:hover {
+  transform: scale(1.05) !important;
+  background-color: #0f172a !important;
+  box-shadow: 0 0 12px rgba(56,189,248,0.6);
+}
+
+
+#confirmReplay:disabled, button:disabled {
+  background-color: #1a2333;
+  box-shadow: 0 0 6px rgba(148,163,184,0.4);
+  color: #9ca3af;
+  border: 1px solid #475569;
+  cursor: not-allowed;
+}
+
+#confirmReplay:disabled:hover, button:disabled:hover {
+  background-color: #0f1520;   /* slightly darker gray */
+  color: #9ca3af;              /* same gray text */
+  border: 1px solid #475569;   /* same border */
+  box-shadow: 0 0 6px rgba(148,163,184,0.7);  /* soft gray glow */
+  transform: none;             /* prevent scaling */
+}
+
+
+/* Input boxes */
+input[type="number"],
+input[type="file"],
+#replayLimit,
+#replayTime {
+  font-size: 1rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
+  color: #e2e8f0;
+  text-align: center;
+}
+input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  background-color: #0f172a;
+}
+
+/* Quiz elements */
+.question-box {
+  background: #1e293b;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(56,189,248,0.1);
+}
+.answers button {
+  display: block;
+  margin: 5px 0;
+  padding: 14px 20px;
+  font-size: 1.2rem;
+  width: 100%;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #334155;
+  color: #f8fafc;
+  transition: all 0.2s ease;
+}
+.answers button:hover {
+  transform: scale(1.05);
+  background: #475569;
+}
+.answers button:disabled {
+  background: #1a2333  ;   /* darker slate */
+  color: #6b7280  ;         /* gray text */
+  border-color: #475569  ;
+  opacity: 0.55  ;          /* dim the whole button */
+  cursor: not-allowed  ;
+  box-shadow: none  ;
+  transform: none  ;
+}
+
+.correct {
+  background: #14532d !important;
+  border-color: #22c55e !important;  color: #22c55e !important;
+  opacity: 0.9 !important; 
+}
+.wrong {
+  background: #450a0a !important;opacity: 0.9 !important; 
+  border-color: #ef4444 !important;  color: #ef4444 !important;
+}
+.feedback {
+  margin-top: 10px;
+  font-weight: bold;
+  white-space: pre-line;
+  color: #94a3b8;
+}
+
+/* Mapping faces */
+.face {
+  background: #1e293b;
+  color: #38bdf8;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: grab;
+  user-select: none;
+  font-weight: bold;
+  transition: 0.2s;
+  border: 1px solid #38bdf8;
+  box-shadow: 0 0 6px rgba(56,189,248,0.3);
+}
+.face:active { transform: scale(0.95); }
+.face.used {
+  background: #475569 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.drop-zone {
+  width: 170px;
+  height: 65px;
+  background: #1a2333;
+  border: 2px dashed #475569;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8fafc;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.drop-zone.filled {
+  border-style: solid;
+  background: #14532d;
+  border-color: #22c55e;
+}
+.drop-zone.dragover {
+  background: #0f172a;
+  border-color: #38bdf8;
+}
+
+/* Timer */
+#timerDisplay {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  background-color: #1e293b;
+  border: 2px solid #38bdf8;
+  color: #38bdf8;
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1.6rem;
+  box-shadow: 0 0 12px rgba(56,189,248,0.3);
+  z-index: 1000;
+}
+
+/* Scorebox */
+#scoreBox {
+  display: none;
+  margin-top: 30px;
+  padding: 15px;
+  background: #1e293b;
+  border-radius: 8px;
+  font-size: 1.2em;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(56,189,248,0.2);
+  color: #38bdf8;
+}
+
+/* Replay button */
+.replay-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  font-size: 4rem;
+  border: none;
+  background: none;
+  color: #38bdf8;
+  cursor: pointer;
+  z-index: 1000;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+.replay-btn:hover { transform: scale(1.1); background: none; }
+
+/* Misc */
+.subtitle {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin-bottom: 15px;
+  margin-left: 20px;
+}
+.rednotething {
+  color: #ef4444;
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .answers button {
+    font-size: 1rem;
+    padding: 8px 10px;
+  }
+  
+}
+/* Alternate button types */
+button.red-btn {
+  background-color: #1a2333;font-weight: bold;
+  color: #f87171;
+  border: 1px solid #f87171;
+  box-shadow: 0 0 8px rgba(239,68,68,0.3);
+}
+button.red-btn:hover {
+  background-color: #1a0b0b;
+  color: #f87171;
+  box-shadow: 0 0 12px rgba(239,68,68,0.6);
+  transform: scale(1.05);
+}
+
+button.purple-btn {
+  background-color: #1a2333;font-weight: bold;
+  color: #ae58ff;
+  border: 1px solid #ae58ff;
+  box-shadow: 0 0 8px rgba(109,70,146,0.4);
+}
+
+button.purple-btn:hover {
+  background-color: #170f1f;
+  color: #d8a6ff;
+  box-shadow: 0 0 12px rgba(174,88,255,0.6);
+  transform: scale(1.05);
+}
+
+button.yellow-btn {
+  background-color: #1a2333;font-weight: bold;
+  color: #f1e432;
+  border: 1px solid #f1e432;
+  box-shadow: 0 0 8px rgba(241,228,50,0.4);
+}
+
+button.yellow-btn:hover {
+background-color: #4c4704;
+  box-shadow: 0 0 12px rgba(241,228,50,0.6);
+  transform: scale(1.05);
+}
+
+#popupReset {
+  background-color: #1a2333;
+  color: #f87171;
+  border: 1px solid #f87171;
+  box-shadow: 0 0 8px rgba(239,68,68,0.3);
+}
+
+#popupReset:hover {
+  background-color: #1a0b0b;
+  color: #f87171;
+  box-shadow: 0 0 12px rgba(239,68,68,0.6);
+  transform: scale(1.05);
+}
+
+#popupDefault {
+  background-color: #1a2333;
+  color: #ae58ff;
+  border: 1px solid #ae58ff;
+  box-shadow: 0 0 8px rgba(109,70,146,0.4);
+} 
+
+#popupDefault:hover {
+  background-color: #170f1f;
+  color: #d8a6ff;
+  box-shadow: 0 0 12px rgba(174,88,255,0.6);
+  transform: scale(1.05);
+}
 </style>
+
 </head>
 <body>
-    <div class="container">
-        <h1 class="glitch" data-text="SHIET!">SHIET!</h1>
-        <p>This website has unfixable bugs and us devs are <span style="color:#ff00ff;">fucking</span> our last braincells to work on.<br>
-        Please come back later.</p>
-    </div>
+<button id="resetBtn"
+        title="Reset"
+        style="display:none; position:fixed; font-size:3.5rem; background:none; border:none; box-shadow:none; color:#007bff; cursor:pointer; z-index:1000; opacity:0.9; transition:all 0.2s ease; top: 20px; left: 48%">
+  🔄
+</button>
 
-    <script>
-        function spawnBanana() {
-            const banana = document.createElement('div');
-            banana.classList.add('banana');
-            banana.textContent = '🍌';
-            banana.style.left = Math.random() * window.innerWidth + 'px';
-            banana.style.top = Math.random() * window.innerHeight + 'px';
-            banana.style.fontSize = (20 + Math.random() * 40) + 'px';
-            document.body.appendChild(banana);
-            setTimeout(() => banana.remove(), 3000);
+<div style="text-align:left; margin-top:10px; margin-bottom:20px;">
+</div>
+  <button onclick="window.open('https://github.com/xXPartOfMeXx/quiz-flashcard-3-sided-chatgpt/tree/main', '_blank')"
+          class = "yellow-btn" style = "font-weight: bold;">
+    💻 GitHub Page of this site
+  </button>
+<h1 id="mainTitle" style="text-align:center;">ÔN TẬP FLASHCARD 3 MẶT - TRẮC NGHIỆM</h1>
+
+<div id="setupSection">
+  <p class="subtitle">
+    Chọn số câu hỏi và thời gian làm bài rồi tải lên file [*.csv] để bắt đầu.
+  </p>
+  <p class="rednotething">
+  Tạo và chỉnh sửa flashcard 3 mặt
+    <a href="https://xxpartofmexx.github.io/3faceflashcard-creator/" target="_blank">tại đây</a>.
+    (hỗ trợ điện thoại nhưng xấu...)
+  </p>
+  <label style="margin-left: 20px;" for="limitInput">Số câu hỏi: </label>
+  <input type="number" id="limitInput" min="1" style="width:70px"><br><br>
+  <label style="margin-left: 20px;" for="timeInput">Thời gian làm bài (phút): </label>
+  <input type="number" id="timeInput" min="0.1" step="0.1" style="width:70px"><br><br>
+  <label style="margin-left: 20px;" for="attemptInput">Số lần thử mỗi câu: </label>
+  <input type="number" id="attemptInput" min="1" value="1" style="width:70px"><br><br>
+
+  <p>
+    <label for="csvFile"
+           id = "upload">
+      Tải lên file [*.csv]
+    </label>
+    <input type="file" id="csvFile" accept=".csv" style="display:none;">
+  </p>
+
+  <p id="importStatus" style="margin-left: 20px; font-weight:bold; color:lime; font-size:1.1rem;"></p>
+  <div style="margin-left:20px; margin-top:10px;" title = "Ghép hết các mặt đề bắt đầu">
+    <button id="startBtn" style="font-weight:bold; display:none;">
+  ▶️ Bắt đầu
+</button>
+  </div>
+</div>
+
+<!-- Drag-drop mapping UI (copied/adjusted from your Tự luận file for identical look & behavior) -->
+<div id="columnSelector" style="display:none; margin-left:20px; margin-top:10px;">
+  <p style="font-weight:bold;">🧩 Kéo thả để chọn mặt tương ứng:</p>
+  <div id="faces" style="display:flex; gap:10px; margin-bottom:10px;">
+    <div class="face" draggable="true" data-index="0">Face 1</div>
+    <div class="face" draggable="true" data-index="1">Face 2</div>
+    <div class="face" draggable="true" data-index="2">Face 3</div>
+  </div>
+
+  <div id="targets" style="display:flex; flex-wrap:wrap; gap:15px;">
+    <div class="drop-zone" data-role="question">🧠 Câu hỏi</div>
+    <div class="drop-zone" data-role="answer">💬 Đáp án</div>
+    <div class="drop-zone" data-role="definition">📘 Giải thích</div>
+    <div style="margin-top:10px;"></div>
+  </div>
+  <div>
+    <br>
+    <button id="defaultMappingBtn"
+            class = "purple-btn">
+      ✅ Cài đặt mặc định
+    </button>
+    <button id="resetMappingBtn"
+            class = "red-btn">
+      🔁 Đặt lại các mặt
+    </button>
+  </div>
+</div>
+
+<div id="quiz"></div>
+<div id="scoreBox"></div>
+<h2 id="timerDisplay" style="display:none;">⏱️ 00:00</h2>
+<button id="replayBtn" class="replay-btn" style="box-shadow:none; display:none;" title="Chơi lại">🔁</button>
+
+<script>
+/* ---------- MCQ logic + mapping integrated ---------- */
+
+let timerInterval = null;
+let quizEnded = false;
+let remainingSeconds = 0;
+let quizStartTime = null;
+
+// 🧩 NEW global score tracking
+let correctCountGlobal = 0;
+let totalQuestionsGlobal = 0;
+
+let lastCSVData = null;
+let fileNameGlobal = "";
+
+// ---------- CSV parser (robust) ----------
+function parseCSV(text) {
+  const rows = [];
+  let currentRow = [];
+  let currentField = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (insideQuotes && nextChar === '"') {
+        // Escaped quote ("")
+        currentField += '"';
+        i++;
+      } else {
+        // Toggle quoted state
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      currentRow.push(currentField);
+      currentField = '';
+    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+      if (currentField || currentRow.length) {
+        currentRow.push(currentField);
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = '';
+      }
+      // handle \r\n properly
+      if (char === '\r' && nextChar === '\n') i++;
+    } else {
+      currentField += char;
+    }
+  }
+
+  if (currentField || currentRow.length) {
+    currentRow.push(currentField);
+    rows.push(currentRow);
+  }
+
+  return rows;
+}
+
+// ---------- Shuffle helper ----------
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+/* ---------- Mapping (drag-drop) ---------- */
+// roleMap: {question: index, answer: index, definition: index}
+let roleMap = {};
+
+function initDragDrop() {
+  const faces = document.querySelectorAll('.face');
+  const zones = document.querySelectorAll('.drop-zone');
+
+  // Reset visual state
+  roleMap = {};
+  zones.forEach(z => {
+    z.textContent = z.dataset.role === "question" ? "🧠 Câu hỏi" :
+                    z.dataset.role === "answer" ? "💬 Đáp án" :
+                    "📘 Giải thích";
+    z.classList.remove("filled");
+  });
+  faces.forEach(f => {
+    f.classList.remove("used");
+    f.draggable = true;
+    f.style.opacity = "1";
+  });
+  document.getElementById("startBtn").disabled = true;
+
+  faces.forEach(face => {
+    face.addEventListener('dragstart', e => {
+      if (face.classList.contains("used")) {
+        e.preventDefault();
+        return;
+      }
+      e.dataTransfer.setData('text/plain', face.dataset.index);
+      e.dataTransfer.effectAllowed = "move";
+    });
+  });
+
+  zones.forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      zone.classList.add('dragover');
+    });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const newIndex = parseInt(e.dataTransfer.getData('text/plain'));
+      if (isNaN(newIndex)) return;
+
+      // If this zone already had a face assigned, free that one
+      if (roleMap[zone.dataset.role] !== undefined) {
+        const oldIndex = roleMap[zone.dataset.role];
+        const oldFace = document.querySelector(`.face[data-index='${oldIndex}']`);
+        if (oldFace) {
+          oldFace.classList.remove("used");
+          oldFace.draggable = true;
+          oldFace.style.opacity = "1";
+        }
+      }
+
+      // Unassign this new face from any other role it was previously linked to
+      for (const role in roleMap) {
+        if (roleMap[role] === newIndex && role !== zone.dataset.role) {
+          delete roleMap[role];
+          const oldZone = document.querySelector(`.drop-zone[data-role='${role}']`);
+          if (oldZone) {
+            oldZone.textContent = role === "question" ? "🧠 Câu hỏi" :
+                                  role === "answer" ? "💬 Đáp án" :
+                                  "📘 Giải thích";
+            oldZone.classList.remove("filled");
+          }
+        }
+      }
+
+      // Assign the new face to this role
+      roleMap[zone.dataset.role] = newIndex;
+      zone.textContent = `${zone.dataset.role.toUpperCase()} ← Face ${newIndex + 1}`;
+      zone.classList.add("filled");
+
+      // Mark the face as used
+      const newFace = document.querySelector(`.face[data-index='${newIndex}']`);
+      if (newFace) {
+        newFace.classList.add("used");
+        newFace.draggable = false;
+        newFace.style.opacity = "0.5";
+      }
+
+      checkMappingComplete();
+    });
+  });
+
+  // Default & Reset wiring
+  const defaultBtn = document.getElementById("defaultMappingBtn");
+  const resetBtn = document.getElementById("resetMappingBtn");
+
+  if (defaultBtn) {
+    defaultBtn.onclick = () => {
+      // Reset first
+      roleMap = {};
+      zones.forEach(z => { z.classList.remove("filled"); });
+      faces.forEach(f => { f.classList.remove("used"); f.draggable = true; f.style.opacity = "1"; });
+
+      // Default
+      roleMap = { question: 0, answer: 1, definition: 2 };
+
+      zones.forEach(zone => {
+        const idx = roleMap[zone.dataset.role];
+        zone.textContent = `${zone.dataset.role.toUpperCase()} ← Face ${idx + 1}`;
+        zone.classList.add('filled');
+      });
+
+      faces.forEach(face => {
+        const idx = parseInt(face.dataset.index);
+        if ([0,1,2].includes(idx)) {
+          face.classList.add('used');
+          face.draggable = false;
+          face.style.opacity = "0.5";
+        }
+      });
+
+      checkMappingComplete();
+    };
+  }
+
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      roleMap = {};
+      zones.forEach(z => {
+        z.textContent = z.dataset.role === "question" ? "🧠 Câu hỏi" :
+                        z.dataset.role === "answer" ? "💬 Đáp án" :
+                        "📘 Giải thích";
+        z.classList.remove("filled");
+      });
+      faces.forEach(f => {
+        f.classList.remove("used");
+        f.draggable = true;
+        f.style.opacity = "1";
+      });
+      document.getElementById("startBtn").disabled = true;
+    };
+  }
+}
+
+function checkMappingComplete() {
+  const startBtn = document.getElementById("startBtn");
+  const allChosen = ["question", "answer", "definition"]
+    .every(r => roleMap[r] !== undefined);
+  startBtn.disabled = !allChosen;
+}
+
+/* ---------- Build MCQ quiz (keeps original MCQ behavior) ---------- */
+function buildQuiz(data) {
+  const quizContainer = document.getElementById("quiz");
+  const scoreBox = document.getElementById("scoreBox");
+  quizContainer.innerHTML = "";
+  scoreBox.innerHTML = "";
+
+  let correctCount = 0;
+  let answeredCount = 0;
+  const maxAttempts = parseInt(document.getElementById("attemptInput").value) || 1;
+
+  // --- FIX START: Helper to check for separator rows ---
+  const isSeparator = (r) => r.every(v => !v || v.toString().trim() === "" || v.toString().trim() === "-");
+
+  // 1. Filter out separator rows so we don't pick them as questions
+  const playableRows = data.filter(r => !isSeparator(r));
+
+  // 2. Calculate limits based on PLAYABLE rows, not total rows
+  const limitInput = parseInt(document.getElementById("limitInput").value);
+  const limit = limitInput || playableRows.length;
+  const totalQuestions = Math.min(limit, playableRows.length);
+  
+  // Update global variable for score calculation
+  totalQuestionsGlobal = totalQuestions; 
+  // --- FIX END ---
+
+  /* -------------------- SPLIT INTO BLOCKS -------------------- */
+  // We use the ORIGINAL 'data' here because we need the separators to define the blocks
+  function splitIntoBlocks(rows) {
+    const blocks = [];
+    let current = [];
+
+    for (let r of rows) {
+      // Use the helper defined above
+      if (isSeparator(r)) {
+        if (current.length) blocks.push(current);
+        current = [];
+      } else {
+        current.push(r);
+      }
+    }
+    if (current.length) blocks.push(current);
+    return blocks;
+  }
+
+  const blocks = splitIntoBlocks(data);
+
+  /* Find which block a row belongs to */
+  function findBlock(row) {
+    return blocks.find(block => block.includes(row));
+  }
+  /* Get wrong answers from same block + same faceIndex */
+  function getWrongAnswers(block, faceIndex, correctValue) {
+    // Safety check
+    if (!block) return []; 
+    
+    // 1. Get all answers from the block
+    const pool = block.map(r => r[faceIndex]);
+
+    // 2. Filter out the CORRECT answer
+    const notCorrect = pool.filter(x =>
+      x.trim().toLowerCase() !== correctValue.trim().toLowerCase()
+    );
+
+    // 3. FIX: Remove duplicates from the WRONG answers list
+    const uniqueWrong = [...new Set(notCorrect)];
+
+    // 4. Shuffle and pick 3
+    return shuffle(uniqueWrong).slice(0, 3); 
+  }
+
+  /* -------------------- TIMER SETUP -------------------- */
+  const timerDisplay = document.getElementById("timerDisplay");
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerDisplay.style.display = "none";
+  quizEnded = false;
+
+  const timeLimitMinutes = parseFloat(document.getElementById("timeInput").value);
+  if (timeLimitMinutes && timeLimitMinutes > 0) {
+    remainingSeconds = timeLimitMinutes * 60;
+    quizStartTime = Date.now();
+    timerDisplay.style.display = "block";
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+      if (quizEnded) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        return;
+      }
+      remainingSeconds--;
+      updateTimerDisplay();
+      if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        quizEnded = true;
+        correctCountGlobal = correctCount;
+        endQuizEarly();
+      }
+    }, 1000);
+  } else {
+    quizStartTime = Date.now();
+  }
+
+  /* -------------------- BUILD QUESTIONS -------------------- */
+  // FIX: Shuffle only the playable rows
+  const selected = shuffle([...playableRows]).slice(0, totalQuestions);
+
+  selected.forEach((row, qIndex) => {
+    const [question, correctAnswer, definition] = row;
+    
+    // Safety check for empty data
+    if (!question) return;
+
+    let attemptLeft = maxAttempts;
+
+    const questionBox = document.createElement("div");
+    questionBox.className = "question-box";
+
+    const qText = document.createElement("h2");
+    qText.textContent = `Q${qIndex + 1}: ${question}`;
+    questionBox.appendChild(qText);
+
+    /* -------- RANDOM OPTIONS FROM SAME BLOCK -------- */
+    const block = findBlock(row);
+    
+    // CRITICAL FIX: If for some reason block is not found, use the row itself as a fallback block
+    // This prevents the "undefined" error if logic fails
+    const safeBlock = block || [row]; 
+
+    const answerFaceIndex = roleMap.answer ?? 1;
+
+    const wrongChoices = getWrongAnswers(safeBlock, answerFaceIndex, correctAnswer);
+
+    const options = shuffle([correctAnswer, ...wrongChoices]);
+
+    /* -------- BUILD OPTION BUTTONS -------- */
+    const answersDiv = document.createElement("div");
+    answersDiv.className = "answers";
+
+    const feedback = document.createElement("div");
+    feedback.className = "feedback";
+
+    options.forEach(option => {
+      const btn = document.createElement("button");
+      // Safety check for option text
+      btn.textContent = option || "Empty";
+
+      btn.onclick = () => {
+        if (quizEnded) return;
+        attemptLeft--;
+        const attemptBadge = document.createElement("div");
+        attemptBadge.className = "attempt-badge";
+        attemptBadge.textContent = `🔁 Lượt thử còn lại: ${attemptLeft}`;
+
+        const isCorrect =
+          (option || "").trim().toLowerCase() === (correctAnswer || "").trim().toLowerCase();
+
+        if (isCorrect) {
+          btn.classList.add("correct");
+          feedback.textContent = `✅ Chính xác!\n${definition || ''}`;
+          feedback.style.color = "green";
+          correctCount++;
+          answeredCount++;
+
+          // lock question
+          [...answersDiv.children].forEach(b => b.disabled = true);
+
+        } else {
+          btn.classList.add("wrong");
+          feedback.textContent = `❌ Sai rồi.\nCòn ${attemptLeft} lần thử`;
+          feedback.style.color = "red";
+
+          if (attemptLeft <= 0) {
+            // out of attempts → show answer + lock
+            feedback.textContent = `❌ Hết lượt!\nĐáp án đúng: ${correctAnswer}\n${definition || ''}`;
+            attemptBadge.textContent = `🔁 Lượt thử còn lại: 0`;
+            attemptBadge.style.color = "#ef4444"; // red highlight when out
+            answeredCount++;
+            [...answersDiv.children].forEach(b => b.disabled = true);
+          }
         }
 
-        setInterval(spawnBanana, 50); // spawn a banana every 0.3s
-    </script>
+        // finish quiz normally
+        if (answeredCount === totalQuestions) {
+          quizEnded = true;
+          clearInterval(timerInterval);
+          timerInterval = null;
+          correctCountGlobal = correctCount;
+          endQuizEarly();
+        }
+      };
+
+      answersDiv.appendChild(btn);
+    });
+
+    questionBox.appendChild(answersDiv);
+    questionBox.appendChild(feedback);
+    quizContainer.appendChild(questionBox);
+  });
+}
+/* ---------- Timer Display ---------- */
+function updateTimerDisplay() {
+  const timerDisplay = document.getElementById("timerDisplay");
+  const mins = Math.floor(remainingSeconds / 60);
+  const secs = remainingSeconds % 60;
+  timerDisplay.textContent = `⏱️ ${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+
+  // Flash red in last 10 seconds
+  if (remainingSeconds <= 10) {
+    timerDisplay.style.backgroundColor = "#f8d7da";
+    timerDisplay.style.borderColor = "#dc3545";
+    timerDisplay.style.color = "#b30000";
+  } else {
+    timerDisplay.style.backgroundColor = "#fff3cd";
+    timerDisplay.style.borderColor = "#ffc107";
+    timerDisplay.style.color = "#d9534f";
+  }
+}
+
+/* ---------- End Quiz Early ---------- */
+function endQuizEarly() {
+  const scoreBox = document.getElementById("scoreBox");
+  const timerDisplay = document.getElementById("timerDisplay");
+
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerDisplay.style.display = "none";
+  quizEnded = true;
+  scoreBox.style.display = "block";
+
+  const totalTime = ((Date.now() - quizStartTime) / 1000).toFixed(1);
+  const percentage = Math.round((correctCountGlobal / totalQuestionsGlobal) * 100);
+
+  // ✅ Check if the user actually set a timer
+  const timeLimitInput = parseFloat(document.getElementById("timeInput").value);
+
+  let timeMessage;
+  if (timeLimitInput && remainingSeconds <= 0) {
+    // only show easter egg if timer was set and time ran out
+    timeMessage = "YOU'RE TAKING TOO LONG 🎃";
+  } else {
+    timeMessage = `Thời gian làm bài: ${totalTime} giây`;
+  }
+
+  let resultMessage = "";
+  if (percentage >= 75) {
+    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). You’re a genius! 🎉🎉`;
+  } else if (percentage >= 50 && percentage < 75) {
+    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). Congratulations! 🎉`;
+  } else if (percentage > 0 && percentage < 50) {
+    resultMessage = `Final Score: ${correctCountGlobal}/${totalQuestionsGlobal} (${percentage}%). We Asians are disappointed in you 😡👿`;
+  } else {
+    resultMessage = `ARE YOU DUMB?`;
+  }
+
+  scoreBox.innerHTML = `${resultMessage}<br>${timeMessage}`;
+}
+
+/* ---------- CSV Loader & UI wiring ---------- */
+const importStatus = document.getElementById("importStatus");
+const startBtn = document.getElementById("startBtn");
+const replayBtn = document.getElementById("replayBtn");
+
+document.getElementById("csvFile").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    const text = evt.target.result;
+    lastCSVData = text;
+    fileNameGlobal = file.name.replace(/\.csv$/i, "").replace(/`/g, '"');
+    importStatus.innerHTML = `Imported <span style="font-style:italic;">${file.name}</span> ✅`;
+    startBtn.style.display = "inline-block";
+
+    // show mapping UI & init drag-drop
+    document.getElementById("columnSelector").style.display = "block";
+    startBtn.disabled = true;
+    initDragDrop();
+  };
+  reader.readAsText(file);
+});
+
+startBtn.addEventListener("click", () => {
+  if (!lastCSVData) return;
+
+  document.getElementById("setupSection").style.display = "none";
+
+  const mainTitle = document.getElementById("mainTitle");
+  mainTitle.textContent = fileNameGlobal || "Quiz";
+  mainTitle.style.textAlign = "center";
+  mainTitle.style.marginBottom = "20px";
+  mainTitle.style.display = "block";
+
+  // remap CSV according to roleMap and start
+  const parsed = parseCSV(lastCSVData);
+  const qIndex = roleMap.question ?? 0;
+  const aIndex = roleMap.answer ?? 1;
+  const dIndex = roleMap.definition ?? 2;
+  const remapped = parsed.map(r => [r[qIndex], r[aIndex], r[dIndex]]);
+  document.getElementById("columnSelector").style.display = "none";
+
+  // show reset button
+  document.getElementById("resetBtn").style.display = "inline-block";
+  replayBtn.style.display = "inline-block";  // ✅ SHOW NOW
+  buildQuiz(remapped);
+  document.getElementById("replayBtn").style.display = "inline-block";
+});
+
+/* ---------- Replay popup (with mapping inside) ---------- */
+replayBtn.addEventListener("click", () => {
+  if (!lastCSVData) return;
+
+  // overlay
+  const overlay = document.createElement("div");
+  overlay.id = "replayOverlay";
+  Object.assign(overlay.style, {
+    position: "fixed",
+    top: 0, left: 0, width: "100%", height: "100%",
+    backgroundColor: "rgba(0,0,0,0.4)",
+    zIndex: 1999
+  });
+  document.body.appendChild(overlay);
+
+  // popup
+  const popup = document.createElement("div");
+  Object.assign(popup.style, {
+    position: "fixed",
+    top: "50%", left: "50%",
+    transform: "translate(-50%, -50%)",
+    background: "#0f172a",
+    padding: "20px 25px",
+    borderRadius: "10px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+    zIndex: 2000,
+    textAlign: "center",
+    maxHeight: "90vh",
+    overflowY: "auto"
+  });
+
+  popup.innerHTML = `
+    <h3>🔁 Chơi lại</h3>
+    <label>Số câu hỏi:</label><br>
+    <input type="number" id="replayLimit" min="1" value="${document.getElementById("limitInput").value || ''}" style="width:80px; margin:5px;"><br>
+    <label>Thời gian làm bài (phút):</label><br>
+    <input type="number" id="replayTime" min="0.1" step="0.1" value="${document.getElementById("timeInput").value || ''}" style="width:80px; margin:5px;"><br><br>
+    <label>Số lần thử mỗi câu:</label><br>
+        <input type="number"
+           id="replayAttempts"
+           min="1"
+           value="${document.getElementById("attemptInput").value || 1}"
+           style="width:80px; margin:5px;"><br><br>
+        <br>
+    <div id="popupFaces" style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+      <div class="popup-face" draggable="true" data-index="0">Face 1</div>
+      <div class="popup-face" draggable="true" data-index="1">Face 2</div>
+      <div class="popup-face" draggable="true" data-index="2">Face 3</div>
+    </div>
+
+    <div id="popupZones" style="display:flex; flex-wrap:wrap; gap:15px; justify-content:center;">
+      <div class="popup-zone" data-role="question">🧠 Câu hỏi</div>
+      <div class="popup-zone" data-role="answer">💬 Đáp án</div>
+      <div class="popup-zone" data-role="definition">📘 Giải thích</div>
+    </div>
+    
+    
+    <div style="margin-top:10px;">
+      <button id = "popupDefault">✅ Cài đặt mặc định</button>
+      <button id = "popupReset">🔁 Đặt lại các mặt</button>
+    </div>
+
+    <br><br>
+    <button id="confirmReplay" title = "Ghép hết các mặt đề bắt đầu">Bắt đầu lại</button>
+    <button id="cancelReplay" class = "red-btn">Hủy</button>
+  `;
+  document.body.appendChild(popup);
+
+  // local mapping
+  const localMap = {};
+
+  function checkComplete() {
+    const btn = document.getElementById("confirmReplay");
+    const complete = ["question","answer","definition"].every(r => localMap[r] !== undefined);
+    btn.disabled = !complete;
+  }
+
+  function resetMapping() {
+    Object.keys(localMap).forEach(k => delete localMap[k]);
+    popup.querySelectorAll(".popup-zone").forEach(z=>{
+      z.classList.remove("filled");
+      z.textContent = z.dataset.role==="question"?"🧠 Câu hỏi":
+                      z.dataset.role==="answer"?"💬 Đáp án":"📘 Giải thích";
+    });
+    popup.querySelectorAll(".popup-face").forEach(f=>{
+      f.classList.remove("used");
+      f.draggable = true;
+      f.style.opacity="1";
+    });
+    checkComplete();
+  }
+
+  // drag/drop for popup
+  const faces = popup.querySelectorAll(".popup-face");
+  const zones = popup.querySelectorAll(".popup-zone");
+
+  faces.forEach(face=>{
+    face.addEventListener("dragstart",e=>{
+      if(face.classList.contains("used")){ e.preventDefault(); return; }
+      e.dataTransfer.setData("text/plain", face.dataset.index);
+    });
+  });
+
+  zones.forEach(zone=>{
+    zone.addEventListener("dragover", e=>{
+      e.preventDefault();
+      zone.classList.add("dragover");
+    });
+    zone.addEventListener("dragleave", ()=>zone.classList.remove("dragover"));
+    zone.addEventListener("drop", e=>{
+      e.preventDefault();
+      zone.classList.remove("dragover");
+      const newIndex=parseInt(e.dataTransfer.getData("text/plain"));
+      if(isNaN(newIndex)) return;
+
+      // Free previous face if this zone had one
+      if(localMap[zone.dataset.role]!==undefined){
+        const oldIndex=localMap[zone.dataset.role];
+        const oldFace=popup.querySelector(`.popup-face[data-index='${oldIndex}']`);
+        if(oldFace){ oldFace.classList.remove("used"); oldFace.draggable=true; oldFace.style.opacity="1"; }
+      }
+
+      // Unassign this new face from other roles
+      for(const role in localMap){
+        if(localMap[role]===newIndex && role!==zone.dataset.role){
+          delete localMap[role];
+          const otherZone=popup.querySelector(`.popup-zone[data-role='${role}']`);
+          if(otherZone){
+            otherZone.classList.remove("filled");
+            otherZone.textContent=role==="question"?"🧠 Câu hỏi":role==="answer"?"💬 Đáp án":"📘 Giải thích";
+          }
+        }
+      }
+
+      // Assign face
+      localMap[zone.dataset.role]=newIndex;
+      zone.classList.add("filled");
+      zone.textContent=`${zone.dataset.role.toUpperCase()} ← Face ${newIndex+1}`;
+
+      // Mark face used
+      const newFace=popup.querySelector(`.popup-face[data-index='${newIndex}']`);
+      if(newFace){ newFace.classList.add("used"); newFace.draggable=false; newFace.style.opacity="0.5"; }
+
+      checkComplete();
+    });
+  });
+
+  document.getElementById("popupReset").onclick = resetMapping;
+  // Default mapping button
+  document.getElementById("popupDefault").onclick = () => {
+    resetMapping();
+
+    const defaultOrder = {
+      question: 0,
+      answer: 1,
+      definition: 2
+    };
+
+    Object.entries(defaultOrder).forEach(([role, index]) => {
+      const zone = popup.querySelector(`.popup-zone[data-role='${role}']`);
+      const face = popup.querySelector(`.popup-face[data-index='${index}']`);
+
+      // Assign mapping
+      localMap[role] = index;
+      zone.classList.add("filled");
+      zone.textContent = `${zone.dataset.role.toUpperCase()} ← Face ${index + 1}`;
+      face.classList.add("used");
+      face.draggable = false;
+      face.style.opacity = "0.5";
+    });
+
+    checkComplete();
+  };
+
+  // close popup & start
+  const closePopup=()=>{
+    document.removeEventListener("keydown",keyHandler);
+    popup.remove(); overlay.remove(); 
+  };
+
+  const startReplay=()=>{
+    const newLimit = parseInt(document.getElementById("replayLimit").value);
+    const newTime = parseFloat(document.getElementById("replayTime").value);
+    const newAttempts = parseInt(document.getElementById("replayAttempts").value);
+    if(!isNaN(newAttempts)) document.getElementById("attemptInput").value = newAttempts;
+    if(!isNaN(newLimit)) document.getElementById("limitInput").value=newLimit;
+    if(!isNaN(newTime)) document.getElementById("timeInput").value=newTime;
+
+    document.getElementById("quiz").innerHTML="";
+    document.getElementById("scoreBox").textContent="";
+    document.getElementById("timerDisplay").style.display="none";
+    clearInterval(timerInterval); timerInterval=null;
+    quizEnded=false; correctCountGlobal=0; totalQuestionsGlobal=0;
+
+    // Apply localMap to remap CSV
+    const parsed = parseCSV(lastCSVData);
+    const qIndex = localMap.question ?? 0;
+    const aIndex = localMap.answer ?? 1;
+    const dIndex = localMap.definition ?? 2;
+    const remapped = parsed.map(r => [r[qIndex], r[aIndex], r[dIndex]]);
+
+    closePopup();
+    buildQuiz(remapped);
+  };
+
+  const keyHandler=(e)=>{
+    if(e.key==="Enter"){ e.preventDefault(); startReplay(); }
+    else if(e.key==="Escape"){ e.preventDefault(); closePopup(); }
+  };
+  document.addEventListener("keydown",keyHandler);
+
+  document.getElementById("confirmReplay").onclick=startReplay;
+  document.getElementById("cancelReplay").onclick=closePopup;
+
+  // initial state
+  resetMapping();
+  setTimeout(()=>document.getElementById("replayLimit").focus(),100);
+});
+
+/* ---------- Reset page button ---------- */
+document.getElementById("resetBtn").addEventListener("click", () => {
+  location.reload();
+});
+</script>
+
 </body>
 </html>
